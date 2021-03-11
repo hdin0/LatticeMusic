@@ -170,12 +170,9 @@ function calcChange() {
         aforceZ += boids.velocity[tar].z * (1/Math.pow(dist,2));
         n++;
 
-        if (dist < sepDist) {
         sforceX += diff.x * (1/Math.pow(dist,2));
         sforceY += diff.y * (1/Math.pow(dist,2));
         sforceZ += diff.z * (1/Math.pow(dist,2));
-        n2++;
-        }
       }
 
     }
@@ -183,7 +180,7 @@ function calcChange() {
     let addition = new THREE.Vector3( 0, 0, 0);
     if (n != 0) {
       if (n2 !=0){
-        addition.sub(separation( sepForce, sforceX, sforceY, sforceZ, cPos, n2));
+        addition.sub(separation( sepForce, sforceX, sforceY, sforceZ, cPos, n));
       }
       addition.add( cohesion( cohForce, cforceX, cforceY, cforceZ, cPos, n) );
       addition = alignment( aliForce, aforceX, aforceY, aforceZ, addition);
@@ -293,7 +290,7 @@ function separation( sepForce, sfX, sfY, sfZ, currentPos, n) {
 function cohesion( cohForce, cfX, cfY, cfZ, currentPos, n) {
   let addv = new THREE.Vector3( cfX-currentPos.x , cfY-currentPos.y, cfZ-currentPos.z );
   let mag = hypot3( addv.x, addv.y, addv.z );
-  addv.multiplyScalar( cohForce/mag );
+  addv.multiplyScalar( cohForce*mag*0.000001 );
   return addv;
 }
 
