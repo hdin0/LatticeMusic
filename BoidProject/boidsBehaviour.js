@@ -93,7 +93,12 @@ function init() {
       let pInt = getPitchInteger( convertToLatticeInd( x0, y0, z0 ) );
     mesh.setColorAt( i, getColor( pInt ) );
     // mesh.setColorAt( i, color.setHex( Math.random() * 0xffffff ) );\
-    i++;
+
+    // normal dist from Ziggurat Method : https://www.seehuhn.de/pages/ziggurat
+    boids.octave.push( Math.round(bmt()*4) );
+    boids.partial.push( Math.round(bmt()*4) );
+
+    i++
 
   }
   scene.add( mesh );
@@ -101,6 +106,8 @@ function init() {
   while ( i < (count)) {
     setInitialMovVal( i );
   }
+
+  console.log(boids.octave);
 }
 
 let stats = new Stats();
@@ -970,8 +977,13 @@ function largeEnoughDomain( gotcha, pitchGoalInt ) {
 
 // sends to pureData
 function triggerReceive( boidIndex, posIndex ) {
-  var val = latticePitchContents[posIndex];
-  val = Math.pow(2,val) * 220;
+  var freq = latticePitchContents[posIndex];
+  freq = Math.pow(2,freq) * 220;
+  freq = boids.partial[boidIndex]*(freq * Math.pow(2,boids.octave[boidIndex]));
+  let val = freq;
+  if (boidIndex == 1 ){
+    // console.log(boids.partial[boidIndex])
+  }
   // val = Math.pow(2,val);
   let receiver = 'num' + boidIndex.toString();
   // console.log(val);
@@ -1031,4 +1043,15 @@ function tconnect( indArr, msgArr, volArr, oscArr ) {
       dum++;
     }
   }
+}
+
+/* This is the box muller transformation from a uniform dist to a normal dist*/
+function bmt() {
+  let u1 = Math.random();
+  let u2 = Math.random();
+
+  let z0 = Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2);
+  // z1 = Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.pi*u2);
+
+  return z0;
 }
