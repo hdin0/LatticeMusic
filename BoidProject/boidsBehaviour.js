@@ -84,8 +84,8 @@ function init() {
     // mesh.setColorAt( i, color.setHex( Math.random() * 0xffffff ) );\
 
     // normal dist from Ziggurat Method : https://www.seehuhn.de/pages/ziggurat
-    boids.octave.push( Math.round(bmt()*3) );
-    boids.partial.push( Math.abs(Math.round(bmt()*4)) );
+    boids.octave.push( Math.round(bmt()*4) );
+    boids.partial.push( Math.abs(Math.round(bmt()*10)) );
 
     i++
 
