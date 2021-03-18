@@ -13,11 +13,6 @@ let latticePitchIntegerContents = new Array( 64000 );
 let finLoading = false;
 let clicked = false;
 
-//webpd fields
-let indArr = []; //this is the lattice index
-let itArr = [];  //this is the number of boids that were found in the lattice index.
-let vc = new Array( 64000 );
-
 // size
 var height = slen;
 var width = slen;
@@ -31,15 +26,9 @@ var sforceX = 0; var sforceY = 0; var sforceZ = 0;
 var cforceX = 0; var cforceY = 0; var cforceZ = 0;
 var aforceX = 0; var aforceY = 0; var aforceZ = 0;
 
-let cenOM = new THREE.Vector3( 400.0, 400.0, 400.0 );
-
-var xmaxN = new THREE.Vector3( -1, 0, 0 ); var xminN = new THREE.Vector3( 1, 0, 0 );
-var ymaxN = new THREE.Vector3( 0, -1, 0 ); var yminN = new THREE.Vector3( 0, 1, 0 );
-var zmaxN = new THREE.Vector3( 0, 0, -1 ); var zminN = new THREE.Vector3( 0, 0, 1);
-
 /* GUI Parameters */
-const count = 250;
-// const count = 10;
+const count = 180;
+// const count = 83;
 //
 
 var scene = new THREE.Scene();
@@ -95,8 +84,8 @@ function init() {
     // mesh.setColorAt( i, color.setHex( Math.random() * 0xffffff ) );\
 
     // normal dist from Ziggurat Method : https://www.seehuhn.de/pages/ziggurat
-    boids.octave.push( Math.round(bmt()*4) );
-    boids.partial.push( Math.round(bmt()*4) );
+    boids.octave.push( Math.round(bmt()*3) );
+    boids.partial.push( Math.abs(Math.round(bmt()*4)) );
 
     i++
 
@@ -106,8 +95,6 @@ function init() {
   while ( i < (count)) {
     setInitialMovVal( i );
   }
-
-  console.log(boids.octave);
 }
 
 let stats = new Stats();
@@ -124,8 +111,6 @@ function getBoidPos( boidIndex ) {
 }
 
 function setInitialMovVal( boidIndex ) {
-
-
   var randDir = new THREE.Vector3( randNum(), randNum(), randNum() );
   randDir.normalize;
   boids.velocity[boidIndex] = randDir.multiplyScalar( 2 );
@@ -134,7 +119,6 @@ function setInitialMovVal( boidIndex ) {
 
 //returns a number from -1 to 1
 function randNum( scale ) {
-  // you'll only have even numbers but that's ok.
   return scale*(2*(Math.random() - 0.5));
 }
 
@@ -242,14 +226,8 @@ function move() {
       let posIndex = convertToLatticeInd( position.x , position.y , position.z );
       if (posIndex < 0 || posIndex > 63999 ) continue
       triggerReceive( i+1, posIndex )
-      positionCounter( i );
     }
   }
-}
-
-// to deal with neg mod values. Always outputs a positive number.
-function mod(n,m) {
-  return ((n%m) + m) %m;
 }
 
 /* av,bv - THREE.js vector3 objects
@@ -321,31 +299,53 @@ function alignment( afX, afY, afZ, currVel ) {
 }
 
 function calcPitchPosGoal( pitch_val ){
-  let goalind = setPitchGoal( pitch_val );
+  let mcomP = mostCommonPitchInteger();
+  let goalind = setPitchGoal( mod(pitch_val+mcomP,12) );
 
-  for( i=0; i<count; i++){
+  for( let i=0; i<count; i++){
     let r = getBoidPos( i );
-    let cPos = new THREE.Vector3( r.x, r.y, r.z );
-    let withinEyesight = fibonacci_sphere( eyeDist*2, 10, cPos.x, cPos.y, cPos.z );
 
+    let totsamples = 10;
+    let phi = Math.PI*(3 - Math.pow(5,0.5));
+    let rad = eyeDist*2;
+    let k = 0, p = 0;
     let found = false;
-    let j = 0;
+    let x=0,y=0,z=0,radius=0,theta=0;
+
     while (found == false){
-      let p = getPitchInteger( convertToLatticeInd( withinEyesight[j].x, withinEyesight[j].y, withinEyesight[j].z ) );
+      y = (1-(k/(totsamples-1)))*2;
+      radius = Math.pow(1-y*y,0.5);
+      theta = phi*k;
+      x = Math.cos(theta)*radius;
+      z = Math.sin(theta)*radius;
+
+      x = mod((rad*x)+r.x,slen)
+      y = mod((rad*y)+r.y,slen);
+      z = mod((rad*y)+r.z,slen);
+
+      p = getPitchInteger( convertToLatticeInd( x, y, z ) );
+      k++;
       if (p == goalind){
-        boid.goalPos[i] = withinEyesight[j];
         found = true;
+        boids.goalPos[i] = new THREE.Vector3( x, y, z );
+      } else if (k > totsamples) {
+        rad = rad*1.1;
+        k = 0;
       }
     }
   }
 }
 
 function move_withA_goal( pitch_val) {
-
+  // console.log( pitch_val );
   calcPitchPosGoal( pitch_val );
-
+  //
   for (let i = 0; i < count; i++ ) {
-    calcChange( boids.goalPos[i].x,boids.goalPos[i].y, boids.goalPos[i].z );
+    let dir = vectorToPeriodic( getBoidPos( i ), boids.goalPos[i], slen );
+    if (hypot3(dir.x,dir.y,dir.z)){
+      dir.multiplyScalar( 1/hypot3(dir.x,dir.y,dir.z) );
+    }
+    calcChange( dir.x,dir.y,dir.z );
 
     let currAccel = boids.accel[i];
     if ( boids.accelerationLimit ) {
@@ -383,7 +383,6 @@ function move_withA_goal( pitch_val) {
     mesh.instanceMatrix.needsUpdate = true;
     mesh.instanceColor.needsUpdate = true;
 
-
      //this is only here bc the bounds don't work well.
     // teleport( i );
     if ( finLoading && ( i < 190 )) {
@@ -391,8 +390,7 @@ function move_withA_goal( pitch_val) {
       position.setFromMatrixPosition( matrix );
       let posIndex = convertToLatticeInd( position.x , position.y , position.z );
       if (posIndex < 0 || posIndex > 63999 ) continue
-      triggerReceive( i+1, posIndex )
-      positionCounter( i );
+      triggerReceive( i+1, posIndex );
     }
   }
 }
@@ -405,6 +403,10 @@ function lookRightDir() {
   matrix.lookAt( position, center, up );
 }
 
+// to deal with neg mod values. Always outputs a positive number.
+function mod(n,m) {
+  return ((n%m) + m) %m;
+}
 // splits the 3d triangle into two hypot.
 // supposedly FAST
 function hypot3(a, b, c) {
@@ -454,66 +456,6 @@ function avoidObstacles( boidIndex ) {
   }
 }
 
-/*
-component: 0 - x, 1 - y, 2 - z
-value: value along axis.
-*/
-function walls( component, value) {
-  let accept = 0;
-
-  switch (component) {
-    case 0:
-      if (value < xMin) {
-        accept=1;
-      } else if (value > xMax) {
-        accept=1;
-      }
-      break;
-    case 1:
-      if (value < yMin) {
-        accept=1;
-      } else if (value > yMax) {
-        accept=1;
-      }
-      break;
-    case 2:
-      if (value < zMin) {
-        accept=1;
-      } else if (value > zMax) {
-        accept=1;
-      }
-      break;
-    default:
-      console.log(1); // something has gone wrong.
-
-  }
-  return accept;
-}
-
-// Takes in an interval(ex. fifth(7), M-third(4)) value, returns a location
-function rand_findPitch( interval ){
-  let mostFreqInt = mostCommonPitchInteger();
-  let pitchGoalInt = (mostFreqInt + interval) % 12;
-
-  let found = false;
-  let r = 0;
-  let tickss = 0;
-  while (found == false){
-    r = Math.round(Math.random()*64000);
-    if (latticePitchIntegerContents[r] == pitchGoalInt){
-      found = true;
-    }
-    tickss++;
-    if (tickss == 64000){
-      found = true;
-      console.log('wrong');
-    }
-  }
-  return (convertToXYZ(r));
-  // return latticePitchIntegerContents;
-}
-
-
 // let old = sepDist;
 
 let tii = 0;
@@ -529,8 +471,6 @@ function animate() {
   }
   stats.update();
   // controls.update();
-
-
   render();
 
 }
@@ -571,10 +511,11 @@ async function handleData( file ){
   finLoading = true;
   init();
   animate();
+  // move_withA_goal( 5 );
 }
 handleData('./sept11pValuesByLine.txt')
 // init();
-// move();
+
 // console.log( rand_findPitch( 7 ) );
 //
 
@@ -645,58 +586,7 @@ function convertToXYZ( latticeInd ) {
 }
 
 function mostCommonPitch() {
-  let tempArr = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-  for (let i=0; i<count; i++) {
-    let p = getBoidPos(i);
-    let posInd = convertToLatticeInd( p.x, p.y, p.z );
-    let val = latticePitchContents[posInd]; //The output is between 0 and 1.
-    switch(Math.round(val*12)) {
-      case 0:
-        tempArr[0]++;
-        break;
-      case 1:
-        tempArr[1]++;
-        break;
-      case 2:
-        tempArr[2]++;
-        break;
-      case 3:
-        tempArr[3]++;
-        break;
-      case 4:
-        tempArr[4]++;
-        break;
-      case 5:
-        tempArr[5]++;
-        break;
-      case 6:
-        tempArr[6]++;
-        break;
-      case 7:
-        tempArr[7]++;
-        break;
-      case 8:
-        tempArr[8]++;
-        break;
-      case 9:
-        tempArr[9]++;
-        break;
-      case 10:
-        tempArr[10]++;
-        break;
-      case 11:
-        tempArr[11]++;
-        break;
-      case 12:
-        tempArr[0]++;
-    }
-  }
-  let mostFrequent = 0;
-  for (let i=0; i<tempArr.length; i++){
-    if (tempArr[i] > tempArr[mostFrequent]) {
-      mostFrequent = i;
-    }
-  }
+  let mostFrequent = mostCommonPitchInteger();
   let msg = "O";
   switch( mostFrequent ) {
     case 0:
@@ -799,7 +689,8 @@ function mostCommonPitchInteger() {
 
 function getPitchInteger( latticePitchIndex ) {
   let val = latticePitchContents[latticePitchIndex];
-  switch(Math.round(val*12)) {
+  // console.log(val);
+  switch (Math.round(val*12)) {
     case 0:
       return 0;
       break;
@@ -841,138 +732,6 @@ function getPitchInteger( latticePitchIndex ) {
   }
 }
 
-function setPitchGoal( val ) {
-  let mostFreqInt = mostCommonPitchInteger();
-  let pitchGoalInt = (mostFreqInt + val) % 12;
-
-
-  // start rad a distance away from adjacent blocks.
-  // for (let rad = divisor*3.9; i<= latticeSidelen; i=i+(divisor*.9)) {
-    //   let lattIndArr = fibonacci_sphere( rad, 100, avgP.x, avgP.y, avgP.z );
-    //
-    //
-    //   let viablePositions = findPitches( lattIndArr, pitchGoalInt );
-    //   let result = largeEnoughDomain( viablePositions, pitchGoalInt );
-    //   if (result != 0 ){
-      //     thereIsAGoal = true;
-      //     return result;
-      //   }
-      // }
-      // console.log('1') // either no good results (positions to move towards), or some other problem.
-  return pitchGoalInt;
-}
-
-function getAvgBoidPos() {
-  let avgBoidPos = new THREE.Vector3();
-  for (let i=0; i<count; i++) {
-    avgBoidPos.add( getBoidPos( i ) );
-  }
-  avgBoidPos.multiplyScalar( 1/count );
-  if (avgBoidPos.length == 0) {
-    console.log('2') //something went wrong with getAvgBoidPos()
-  }
-  return avgBoidPos;
-}
-
-// The sphere made below is a unit sphere, rad acts as a multiplier to grow the sphere
-function fibonacci_sphere_toPitches( rad, samples, x0, y0, z0 ) {
-  let points = new Array( samples );
-  let phi = Math.PI * (3 - Math.pow( 5, 1/2 ) );
-
-  for (let i=0; i<samples; i++) {
-    let y = ((1 - (i / (samples - 1) ) * 2)*rad) + y0;
-    let radius = Math.pow(1 - (y*y),1/2 );
-
-    let theta = phi*i;
-
-    let x = ((Math.cos(theta) *radius)*rad) + x0;
-    let z = ((Math.sin(theta) *radius)*rad) + z0;
-
-    // B.C.
-    if (x < 0) {
-      x = 0;
-    } else if (x > slen) {
-      x = slen;
-    }
-    if (y < 0) {
-      y = 0;
-    } else if (x > slen) {
-      y = slen;
-    }
-    if (z < 0) {
-      z = 0;
-    } else if (x > slen) {
-      z = slen;
-    }
-    points[i] = convertToLatticeInd( x, y, z );
-  }
-  return points;
-}
-
-function fibonacci_sphere( rad, samples, x0, y0, z0 ) {
-  let points = [];
-  points.x = new Array( samples );
-  points.y = new Array( samples );
-  points.z = new Array( samples );
-
-  let phi = Math.PI * (3 - Math.pow( 5, 0.5 ) );
-
-  for (let i=0; i<samples; i++) {
-    let y = ((1 - (i / (samples - 1) ) * 2));
-    let radius = Math.pow(1 - (y*y),1/2 );
-
-    let theta = phi*i;
-
-    let x = Math.cos(theta) *radius;
-    let z = Math.sin(theta) *radius;
-
-    points.x[i] = (rad*x)+x0;
-    points.y[i] = (rad*y)+y0;
-    points.z[i] = (rad*z)+z0;
-  }
-  // console.log(x0)
-  // console.log(y0)
-  // console.log(z0)
-  // console.log(points);
-  return points;
-}
-
-function findPitches( p_indArr, pitchGoal ) {
-  let gotcha = [];
-
-  for (let i=0; i<p_indArr.length; i++) {
-    if (((p_indArr[i] - (((pitchGoal*2)-1)/24)) > 0) && ((p_indArr[i] - (((pitchGoal*2)+1)/24)) < 0)) {
-      gotcha.push(p_indArr[i]);
-    }
-  }
-  return gotcha;
-}
-
-function largeEnoughDomain( gotcha, pitchGoalInt ) {
-  let i = 0;
-  while( i < gotcha.length) {
-    let center = gotcha[i];
-    let counter = 1;
-    while (counter < 3) { //looking for a pitch domain of at least 3 blocks in size.
-      //check +-z, then +-y, then +-x
-      if ( getPitchInteger(latticePitchContents[center+1]) == pitchGoalInt ) { counter++; }
-      if ( getPitchInteger(latticePitchContents[center-1]) == pitchGoalInt ) { counter++; }
-      if ( getPitchInteger(latticePitchContents[center+40]) == pitchGoalInt ) { counter++; }
-      if ( getPitchInteger(latticePitchContents[center-40]) == pitchGoalInt ) { counter++; }
-      if ( getPitchInteger(latticePitchContents[center+1600]) == pitchGoalInt ) { counter++; }
-      if ( getPitchInteger(latticePitchContents[center-1600]) == pitchGoalInt ) { counter++; }
-      if (counter < 3) { counter = 100; }
-    }
-
-    if ((counter >=3) || (counter < 100)) {
-      i = Number.MAX_SAFE_INTEGER; //exit out of while loop
-      return center;
-    }
-    i++;
-  }
-  return 0; //the gotcha array did not have a domain big enough.
-}
-
 /* WEBPD */
 
 // sends to pureData
@@ -980,70 +739,14 @@ function triggerReceive( boidIndex, posIndex ) {
   var freq = latticePitchContents[posIndex];
   freq = Math.pow(2,freq) * 220;
   freq = boids.partial[boidIndex]*(freq * Math.pow(2,boids.octave[boidIndex]));
-  let val = freq;
+  let val = parseFloat(freq);
   if (boidIndex == 1 ){
-    // console.log(boids.partial[boidIndex])
+    // console.log(val)
   }
-  // val = Math.pow(2,val);
   let receiver = 'num' + boidIndex.toString();
-  // console.log(val);
-  Pd.send( receiver , [parseFloat(val)] );
+  Pd.send( receiver , [val] );
 }
 
-//goal is to minimize the #of times we send to webpd.
-function positionCounter( boidIndex ) {
-  let ind = getBoidPos( boidIndex );
-  let latInd = convertToLatticeInd( ind.x, ind.y, ind.z );
-  vc[latInd]++;
-}
-
-function cleanVolArray( vc ) {
-  let totItNum = 0;
-  vc.forEach( (itNum) => {
-    totItNum += itNum;
-  })
-  vc.forEach( (itNum, latInd) => {
-    if (itNum != 0){
-      itArr.push( itNum/totItNum );
-      indArr.push( latInd );
-    }
-  });
-}
-
-function send2PD() {
-  for (let i=0; i<indArr.length; i++){
-    let val = Math.round( latticePitchContents[indArr[i]] * 440 ); //this sends the pitch.
-    let vol = itArr[i]; //this sends the volume multiplier.
-    Pd.send( 'pitch', [ parseFloat(val)] );
-    // Pd.send( 'volMult', [parseFloat(vol)] );
-  }
-}
-
-let numOfosc = 0;
-let maxOsc = 0;
-function tconnect( indArr, msgArr, volArr, oscArr ) {
-  // var triggerObject = patch.createObject('trigger', ['bang', 'float', 'float'])
-  if (maxOsc == 0){
-    maxOsc = indArr.length;
-
-    // not done, make a lot of osc for the first execution of this function.
-
-  } else if (numOfosc > indArr.length) { //there are more boids in diff positions than existing oscs.
-    let make = indArr.length - numOfosc;
-    for (let i=0; i<make; i++){
-      oscArr.push( patch.createObject( 'msg', [parseFloat( sOOOOOOOO )]) );
-      msgArr.push( patch.createObject( 'osc~' ) );
-      msgArr[msgArr.length-1].o(0).connect( oscArr[oscArr.length-1].i(0) )
-    }
-    numOfosc = indArr.length;
-  } else { //the boids are more clumped together, and we can reuse past osc~s.
-    let dum = numOfosc;
-    while (dum < indArr.length) {
-      oscArr()
-      dum++;
-    }
-  }
-}
 
 /* This is the box muller transformation from a uniform dist to a normal dist*/
 function bmt() {
