@@ -17,13 +17,17 @@
 <body>
   <script src="js/jquery.js"></script>
   <script src="js/webpd-latest.js"></script>
+  <button onClick="start()"> Start Patch </button> 
   <script>
+    function start() {
       var patch
       // <!-- if you want to change patches, change the line directly below -->
       $.get('patches/addSynSmaller2.pd', function(patchStr) {
         patch = Pd.loadPatch(patchStr)
         Pd.start();
       })
+    }
+      
       let listening = 1;
 
   </script>
