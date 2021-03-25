@@ -105,7 +105,7 @@ function init() {
 }
 
 let stats = new Stats();
-document.body.appendChild( stats.dom );
+// document.body.appendChild( stats.dom );
 
 function onMouseDown( event_info ) {
   event_info.preventDefault(); //stop any other event listener from receiving this event.
@@ -499,7 +499,7 @@ function animate() {
   if (finLoading) {
     vue_det.message = mostCommonPitch();
   }
-  stats.update();
+//   stats.update();
   // controls.update();
   render();
 
