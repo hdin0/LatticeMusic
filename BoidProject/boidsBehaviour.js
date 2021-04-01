@@ -92,7 +92,7 @@ function init() {
     setInitialMovVal( i );
   }
 
-  renderer.domElement.addEventListener( 'mousedown', onMouseDown );
+//   renderer.domElement.addEventListener( 'mousedown', onMouseDown );
 }
 
 let stats = new Stats();
