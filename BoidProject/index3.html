@@ -36,7 +36,7 @@ input[type=number] {
 <body>
   <script src="js/jquery.js"></script>
   <script src="js/webpd-latest.js"></script>
-  <script>
+<!--   <script>
       var patch
       // <!-- if you want to change patches, change the line directly below -->
       $.get('patches/addSynSmaller2.pd', function(patchStr) {
@@ -44,8 +44,22 @@ input[type=number] {
         Pd.start();
       })
       let listening = 1;
-  </script>
+  </script> -->
 
+  <div class="sound-buttons">
+      <button id="startOn" onclick="openPatch()">Start Patch</button>
+      <script>
+      function openPatch() {
+          var patch
+          // <!-- if you want to change patches, change the line directly below -->
+          $.get('patches/addSynSmaller2.pd', function(patchStr) {
+            patch = Pd.loadPatch(patchStr)
+            Pd.start();
+          })
+        }
+        let listening = 1;
+      </script>
+  </div>
   <script>
     let latticeSidelen = 40; // don't change this
     let slen = 400; // you can change this, but if it's too large, then threejs doesn't render boids that are too far away.
