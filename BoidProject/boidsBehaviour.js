@@ -53,6 +53,8 @@ function onWindowResize() {
 }
 
 const controls = new OrbitControls( camera, renderer.domElement );
+controls.target.set( slen/2, slen/2, slen/2 ); 
+controls.update();
 // to allow zoom
 controls.enableZoom = true;
 // to disable rotation
