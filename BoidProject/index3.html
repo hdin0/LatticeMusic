@@ -218,7 +218,7 @@ input[type=number] {
       </v-col>
         <v-col cols="12" sm="6" md="9">
           <v-slider
-            value="boidMass.val"
+            value="10"
             min="0"
             hide-details
             class="align-center"
@@ -246,8 +246,7 @@ input[type=number] {
       </v-col>
         <v-col cols="12" sm="6" md="9">
           <v-slider
-            v-model="eye_dist.val"
-            value="eye_dist.val"
+            value="30"
             min="0"
             max="400"
             hide-details
@@ -275,7 +274,7 @@ input[type=number] {
       </v-col>
         <v-col cols="12" sm="6" md="9">
           <v-slider
-            value="sep_force.val"
+            value="10"
             min="0"
             hide-details
             class="align-center"
@@ -302,7 +301,7 @@ input[type=number] {
       </v-col>
         <v-col cols="12" sm="6" md="9">
           <v-slider
-            value="coh_force.val"
+            value="1"
             min="0"
             hide-details
             class="align-center"
@@ -329,7 +328,7 @@ input[type=number] {
       </v-col>
         <v-col cols="12" sm="6" md="9">
           <v-slider
-            value="ali_force.val"
+            value="80"
             min="0"
             hide-details
             class="align-center"
@@ -402,7 +401,7 @@ input[type=number] {
     </v-row no-gutters>
 
       <v-row>
-        <v-col cols="12" sm="6" md="4">
+        <v-col cols="12" sm="6" md="3">
           <!-- <span>f = partial*(f0 * 2^octave)</span> -->
           <!-- <span v-if= volSlider.val==0>
             Nothing is playing
@@ -411,7 +410,7 @@ input[type=number] {
             Volume: {{ volSlider.val }}
           </span> -->
         </v-col>
-        <v-col cols="12" md="8" title="Each frequency heard is calculated by this function. Each boid possesses a specific partial and octave assignment, determined by the following fields and switches. F0 is the pitch value of the specific coordinate the boid is in. ">
+        <v-col cols="12" md="9" title="Each frequency heard is calculated by this function. Each boid possesses a specific partial and octave assignment, determined by the following fields and switches. F0 is the pitch value of the specific coordinate the boid is in. ">
           f = partial*(f0 * 2^octave)
       </v-col>
       </v-row>
@@ -641,6 +640,7 @@ const App = {
             break;
           case 1:
             eyeDist = value;
+            this.eye_dist.val = value;
             break;
           case 2:
             sepForce = value/100;
