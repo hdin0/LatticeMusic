@@ -154,6 +154,7 @@ input[type=number] {
     settings.samplingRate = 2;
     settings.fileVer = 1;
     settings.updateRate = 60;
+    let fileVer = settings.fileVer;
     let updateRate = settings.updateRate;
 
     // let count = 180;
@@ -856,7 +857,7 @@ const App = {
       // Pd.send( "phaseModHz" , [parseFloat(value)] );
     },
     loadFile: function( value ){
-      settings.fileVer = value;
+      fileVer = value;
     }
   }
 }
