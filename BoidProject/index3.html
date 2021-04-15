@@ -153,6 +153,8 @@ input[type=number] {
     settings.octaveHigh = 4;
     settings.samplingRate = 2;
     settings.fileVer = 1;
+    settings.updateRate = 60;
+    let updateRate = settings.updateRate;
 
     // let count = 180;
 
@@ -366,7 +368,7 @@ input[type=number] {
 
       <v-row no-gutters>
         <!-- <v-col cols="12" sm="6" md="1"></v-col> -->
-        <v-col cols="12" sm="6" md="4">
+        <v-col cols="12" sm="6" md="3">
           <v-text-field
           title="The max distance each boid can move per frame."
             v-model="accel_limit"
@@ -378,7 +380,7 @@ input[type=number] {
             @change="onChange($event, 8,1)"
           ></v-text-field>
         </v-col>
-        <v-col cols="12" sm="6" md="4">
+        <v-col cols="12" sm="6" md="3">
           <v-text-field
           title="The max distance each boid can move per frame."
             v-model="speed_limit"
@@ -391,7 +393,7 @@ input[type=number] {
           ></v-text-field>
         </v-col>
         <!-- <v-col cols="12" sm="6" md="1"></v-col> -->
-        <v-col cols="12" sm="6" md="4">
+        <v-col cols="12" sm="6" md="3">
           <v-text-field
             title="Essentially how fast pitch values are communicated to the audio api (calls/sec). Default is purposefully set high to avoid potential crashes. Lower at a moderately slow pace. Ideally it would be set to 60"
             v-model="sampling_rate"
@@ -401,6 +403,18 @@ input[type=number] {
             class="text-normal"
             min="0"
             @change="onChange($event,6,1)"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="12" sm="6" md="3">
+          <v-text-field
+            title="Normally you want 60 frame per second"
+            v-model="frame_rate"
+            label="Call Rate"
+            type="number"
+            color="rgba(204, 214, 220, 1)"
+            class="text-normal"
+            min="0"
+            @change="onChange($event,9,1)"
           ></v-text-field>
         </v-col>
       </v-row>
@@ -612,7 +626,7 @@ input[type=number] {
     </v-container>
   </v-app>
   </script>
-  <p> error text</p>
+  <p>if you see this, something has gone wrong. Switching your browser might work</p>
 </div>
 
 <!-- Vue & Vuetify instances -->
@@ -651,6 +665,7 @@ const App = {
       modfreq: {val: 0},
       modAmon: {val: 0},
       toggle_exclusive: 1,
+      frame_rate: 60,
     }
   },
   methods: {
@@ -735,6 +750,9 @@ const App = {
             break;
           case 8:
             boids.accelerationLimit = value;
+            break;
+          case 9:
+            updateRate = value;
             break;
           }
       },
