@@ -10,6 +10,8 @@ let inHeight = window.innerHeight * altHeig;
 
 let latticePitchContents = [];
 let latticePitchIntegerContents = new Array( 64000 );
+  let parts = []; //parts and points are helper fields to load the files.
+  let points = [];
 let finLoading = false;
 let clicked = false;
 
@@ -197,9 +199,9 @@ function calcChange( inx, iny, inz ) {
       }
     }
 
-    sforceX = boids.mass*sforceX; sforceY = boids.mass*sforceY; sforceZ = boids.mass*sforceZ;
-    cforceX = boids.mass*cforceX; cforceY = boids.mass*cforceY; cforceZ = boids.mass*cforceZ;
-    aforceX = boids.mass*aforceX; aforceY = boids.mass*aforceY; aforceZ = boids.mass*aforceZ;
+    sforceX = sforceX/boids.mass; sforceY = sforceY/boids.mass; sforceZ = sforceZ/boids.mass;
+    cforceX = cforceX/boids.mass; cforceY = cforceY/boids.mass; cforceZ = cforceZ/boids.mass;
+    aforceX = aforceX/boids.mass; aforceY = aforceY/boids.mass; aforceZ = aforceZ/boids.mass;
 
     let addition = new THREE.Vector3( inx, iny, inz );
     if (n != 0) {
@@ -461,6 +463,22 @@ function tick(){
   return val;
 }
 
+function changeFile(){
+  if (fileVer != settings.fileVer){
+    switch (fileVer){
+      case 1:
+        handleData('./sept11pValuesByLine.txt')
+      break;
+      case 2:
+        // do nothing as of now
+      break;
+      case 3:
+        // do nothing as of now.
+      break;
+    }
+  }
+}
+
 function animate() {
 
   requestAnimationFrame(animate);
@@ -471,6 +489,7 @@ function animate() {
   if (finLoading) {
     vue_det.message = mostCommonPitch();
   }
+  changeFile();
   // stats.update();
   controls.update();
   render();
@@ -486,10 +505,6 @@ function render() {
 //
 
 /* LOADS FILE */
-
-let parts = [];
-let points = [];
-
 async function loadFile(url) {
   const req = await fetch(url);
   return req.text();
