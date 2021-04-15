@@ -490,7 +490,7 @@ function animate() {
   requestAnimationFrame(animate);
   if (tick()){
     move();
-    console.log(1);
+//     console.log(1);
   }
   if (finLoading) {
     vue_det.message = mostCommonPitch();
