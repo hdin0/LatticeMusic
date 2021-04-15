@@ -2,8 +2,6 @@ import * as THREE from "https://threejs.org/build/three.module.js";
 import Stats from 'https://threejs.org/examples/jsm/libs/stats.module.js';
 import { OrbitControls } from 'https://threejs.org/examples/jsm/controls/OrbitControls.js';
 import { GUI } from 'https://threejs.org/examples/jsm/libs/dat.gui.module.js';
-import {Projector} from 'https://threejs.org/examples/jsm/renderers/Projector.js';
-
 
 let altWidt = 0.75;
 let altHeig = 1;
@@ -78,6 +76,9 @@ let mouse = new THREE.Vector3(0,0,0);
 //Raycaster creates a beam that extends outwards and returns an array of what objects the beam intersects with, as well as where, and other information.
 let raycaster = new THREE.Raycaster( new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,0) );
 let intersects = [];
+
+const clock = new THREE.Clock();
+let tickCounter = 0;
 
 function init() {
 
@@ -448,15 +449,24 @@ var myFunction = function(){
 }
 var timeout = setTimeout(myFunction, marker);
 
-// clearInterval( repPlay );
+function tick(){
+  // const delta = clock.getDelta();
+  tickCounter += clock.getDelta();
+  let val = 0;
+  if (tickCounter > (1/updateRate)){
+    tickCounter = 0;
+    val = 1;
+  }
+  // console.log(clock.getDelta)
+  return val;
+}
 
 function animate() {
 
   requestAnimationFrame(animate);
-  if (searching == false) {
+  if (tick()){
     move();
-  } else {
-    move_withA_goal( pitchGoal );
+    console.log(1);
   }
   if (finLoading) {
     vue_det.message = mostCommonPitch();
@@ -466,8 +476,6 @@ function animate() {
   render();
 
 }
-// init();
-// console.log);
 
 function render() {
   renderer.render( scene, camera );
