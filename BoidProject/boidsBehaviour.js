@@ -168,7 +168,7 @@ function calcChange( inx, iny, inz ) {
     sforceX = 0; sforceY = 0; sforceZ = 0;
     cforceX = 0; cforceY = 0; cforceZ = 0;
     aforceX = 0; aforceY = 0; aforceZ = 0;
-    boids.accel[i] = new THREE.Vector( 0,0,0 );
+    boids.accel[i] = new THREE.Vector3( 0,0,0 );
     let n = 0;
     let n2 = 0;
 
