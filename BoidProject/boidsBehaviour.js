@@ -112,28 +112,28 @@ function init() {
 // let stats = new Stats();
 // document.body.appendChild( stats.dom );
 
-function onMouseDown( event_info ) {
-  event_info.preventDefault(); //stop any other event listener from receiving this event.
-  mouse.x = (event.clientX / inWidth)*2 - 1;
-  mouse.y = -(event.clientY / inHeight)*2 + 1;
-  mouse.z = 0.5;
-
-
-  raycaster.setFromCamera( mouse, camera );
-  var intersects = raycaster.intersectObjects( scene.children );
-  addOneThing( mouse.x, mouse.y, 0)
-}
-
-function addOneThing( x, y, z) {
-  let g = new THREE.SphereGeometry( 30, 6, 6 );
-  let mat = new THREE.MeshBasicMaterial({ color:  Math.random() * 0xffffff });
-  let dot = new THREE.Mesh( g, mat );
-  dot.position.set( x, y, z );
-  console.log( x );
-  console.log( y );
-  console.log( z );
-  scene.add( dot );
-}
+// function onMouseDown( event_info ) {
+//   event_info.preventDefault(); //stop any other event listener from receiving this event.
+//   mouse.x = (event.clientX / inWidth)*2 - 1;
+//   mouse.y = -(event.clientY / inHeight)*2 + 1;
+//   mouse.z = 0.5;
+//
+//
+//   raycaster.setFromCamera( mouse, camera );
+//   var intersects = raycaster.intersectObjects( scene.children );
+//   addOneThing( mouse.x, mouse.y, 0)
+// }
+//
+// function addOneThing( x, y, z) {
+//   let g = new THREE.SphereGeometry( 30, 6, 6 );
+//   let mat = new THREE.MeshBasicMaterial({ color:  Math.random() * 0xffffff });
+//   let dot = new THREE.Mesh( g, mat );
+//   dot.position.set( x, y, z );
+//   console.log( x );
+//   console.log( y );
+//   console.log( z );
+//   scene.add( dot );
+// }
 
 //
 
@@ -168,6 +168,7 @@ function calcChange( inx, iny, inz ) {
     sforceX = 0; sforceY = 0; sforceZ = 0;
     cforceX = 0; cforceY = 0; cforceZ = 0;
     aforceX = 0; aforceY = 0; aforceZ = 0;
+    boids.accel[i] = new THREE.Vector( 0,0,0 );
     let n = 0;
     let n2 = 0;
 
@@ -192,9 +193,9 @@ function calcChange( inx, iny, inz ) {
         aforceZ += aliForce*(boids.velocity[tar].z * (1/Math.pow(dist,2)));
         n++;
 
-        sforceX += diff.x * (1/Math.pow(dist,2));
-        sforceY += diff.y * (1/Math.pow(dist,2));
-        sforceZ += diff.z * (1/Math.pow(dist,2));
+        sforceX += diff.x * (1/Math.pow(dist,3));
+        sforceY += diff.y * (1/Math.pow(dist,3));
+        sforceZ += diff.z * (1/Math.pow(dist,3));
 
       }
     }
@@ -215,7 +216,6 @@ function calcChange( inx, iny, inz ) {
       addition.add( cohesion( cohForce, cforceX, cforceY, cforceZ, n) );
       addition.add( alignment( aforceX, aforceY, aforceZ, boids.velocity[i]) );
     }
-    // console.log(addition);
     boids.accel[i].add( addition );
   }
 }
@@ -336,7 +336,7 @@ function separation( sepForce, sfX, sfY, sfZ, n) {
 
 function cohesion( cohForce, cfX, cfY, cfZ, n) {
   let addv = new THREE.Vector3( cfX, cfY, cfZ );
-  addv.multiplyScalar( cohForce/n );
+  addv.multiplyScalar( cohForce );
   return addv;
 }
 
