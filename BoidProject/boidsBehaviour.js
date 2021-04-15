@@ -199,9 +199,15 @@ function calcChange( inx, iny, inz ) {
       }
     }
 
-    sforceX = sforceX/boids.mass; sforceY = sforceY/boids.mass; sforceZ = sforceZ/boids.mass;
-    cforceX = cforceX/boids.mass; cforceY = cforceY/boids.mass; cforceZ = cforceZ/boids.mass;
-    aforceX = aforceX/boids.mass; aforceY = aforceY/boids.mass; aforceZ = aforceZ/boids.mass;
+    if (boids.mass != 0) {
+      sforceX = sforceX/boids.mass; sforceY = sforceY/boids.mass; sforceZ = sforceZ/boids.mass;
+      cforceX = cforceX/boids.mass; cforceY = cforceY/boids.mass; cforceZ = cforceZ/boids.mass;
+      aforceX = aforceX/boids.mass; aforceY = aforceY/boids.mass; aforceZ = aforceZ/boids.mass;
+    } else {
+      sforceX = 0; sforceY = 0; sforceZ = 0;
+      cforceX = 0; cforceY = 0; cforceZ = 0;
+      aforceX = 0; aforceY = 0; aforceZ = 0;
+    }
 
     let addition = new THREE.Vector3( inx, iny, inz );
     if (n != 0) {
