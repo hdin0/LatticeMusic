@@ -158,6 +158,12 @@ input[type=number] {
     let fileVer = settings.fileVer;
     let updateRate = settings.updateRate;
 
+    let latticePitchContents = [];
+    let latticePitchIntegerContents = new Array( 64000 );
+      let parts = []; //parts and points are helper fields to load the files.
+      let points = [];
+    let finLoading = false;
+
     // let count = 180;
 
     for(let i=0; i<count; i++){
@@ -177,6 +183,7 @@ input[type=number] {
       return Math.round(z0*scale);
     }
   </script>
+  <script src="loadFiles.js"></script>
 
   <button id="resetCamera">Reset Camera</button>
 <!-- This is the small block at the top left that says what is the most common pitch playing -->
@@ -192,10 +199,6 @@ input[type=number] {
        });
 
      </script>
-
-<!-- <div id = "pitchGoal">
-  <h1>Searching...</h1>
-</div> -->
 
  <!-- CONTROL PANEL -->
 <div id="app">
@@ -833,7 +836,7 @@ const App = {
       document.body.appendChild(js);
       this.overlay = false;
       let bg = document.querySelector('#filler');
-      bg.style.display='none'; 
+      bg.style.display='none';
     },
     onChange: function(value, ind, opt) {
         switch (ind) {
