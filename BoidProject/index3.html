@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="./boidsStyle.css">
   <script src="js/vue-latest.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+
 </head>
 <style>
 input::-webkit-outer-spin-button,
@@ -176,12 +177,10 @@ input[type=number] {
       return Math.round(z0*scale);
     }
   </script>
-  <!-- Directly below loads all the boids and methods. It's important that this file is loaded after the above parameter fields. -->
 
-  <script type="module" src="./boidsBehaviour.js"></script>
   <button id="resetCamera">Reset Camera</button>
 <!-- This is the small block at the top left that says what is the most common pitch playing -->
-<div id = "modePitch">
+  <div id = "modePitch">
        <h1>{{ message }}</h1>
     </div>
     <script type = "text/javascript">
@@ -202,6 +201,157 @@ input[type=number] {
 <div id="app">
   <script type="text/x-template" id="app-template">
   <v-app>
+
+    <v-overlay :value="overlay">
+      <v-card
+        class="mx-auto"
+        width="80vw"
+        elevation="8"
+      >
+      <v-card-title class="font-weight-thin"> BOID MUSIC PROGRAM </v-card-title>
+      <v-card-text>
+        <v-container>
+        <v-row>
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-text-field
+              v-model="boidMass.val"
+              label="Boid Mass"
+              type="number"
+              :rules="numberRule"
+              @change="onChange($event, 7,1)"
+            ></v-text-field>
+          </v-col>
+
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-text-field
+              v-model="eye_dist.val"
+              label="Eyesight Distance"
+              type="number"
+              :rules="numberRule"
+              @change="onChange($event, 1,1)"
+            ></v-text-field>
+          </v-col>
+
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-text-field
+              v-model="sep_force.val"
+              label="Separation Force"
+              type="number"
+              :rules="numberRule"
+              @change="onChange($event, 2,1)"
+            ></v-text-field>
+          </v-col>
+
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-text-field
+              v-model="coh_force.val"
+              label="Cohesion Force"
+              type="number"
+              :rules="numberRule"
+              @change="onChange($event, 3,1)"
+            ></v-text-field>
+          </v-col>
+
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-text-field
+              v-model="ali_force.val"
+              label="Alignment Force"
+              type="number"
+              :rules="numberRule"
+              @change="onChange($event, 4,1)"
+            ></v-text-field>
+          </v-col>
+
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-text-field
+              v-model="accel_limit"
+              label="Acceleration Limit"
+              type="number"
+              :rules="numberRule"
+              @change="onChange($event, 8,1)"
+            ></v-text-field>
+          </v-col>
+
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-text-field
+              v-model="speed_limit"
+              label="Speed Limit"
+              type="number"
+              :rules="numberRule"
+              @change="onChange($event, 5,1)"
+            ></v-text-field>
+          </v-col>
+
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-text-field
+              v-model="sampling_rate"
+              label="Sampling Rate"
+              type="number"
+              :rules="numberRule"
+              @change="onChange($event,6,1)"
+            ></v-text-field>
+          </v-col>
+
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-text-field
+              v-model="frame_rate"
+              label="Frame Rate"
+              type="number"
+              :rules="numberRule"
+              @change="onChange($event,9,1)"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+      </v-container>
+      </v-card-text>
+        <v-card-actions>
+          <v-btn
+           text
+           color="primary"
+           @click="loadBoidsCall()"
+           >
+           Set
+         </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-overlay>
+
     <!-- sliders -->
     <v-container>
       <v-row no-gutters>
@@ -266,7 +416,7 @@ input[type=number] {
           type="number"
           color="rgba(204, 214, 220, 1)"
           class="text-normal"
-          @change="onChange($event, 1,2)"
+          @change="onChange($event, 1,1)"
         >
         </v-text-field>
       </v-col>
@@ -410,7 +560,7 @@ input[type=number] {
           <v-text-field
             title="Normally you want 60 frame per second"
             v-model="frame_rate"
-            label="Call Rate"
+            label="Frame Rate"
             type="number"
             color="rgba(204, 214, 220, 1)"
             class="text-normal"
@@ -629,6 +779,7 @@ input[type=number] {
   </script>
   <p>if you see this, something has gone wrong. Switching your browser might work</p>
 </div>
+<div id="filler"> here here here</div>
 
 <!-- Vue & Vuetify instances -->
 <script>
@@ -636,6 +787,11 @@ const App = {
   template: '#app-template',
   data: function() {
     return {
+      absolute: true,
+      overlay: true,
+      numberRule: [
+      v => !!v || 'Number is Required',
+      ],
       switch1: true,
       switch2: true,
       accel_limit: 3,
@@ -670,6 +826,15 @@ const App = {
     }
   },
   methods: {
+    loadBoidsCall: function(){
+      let js = document.createElement("script");
+      js.type = "module";
+      js.src = "./boidsBehaviour.js";
+      document.body.appendChild(js);
+      this.overlay = false;
+      let bg = document.querySelector('#filler');
+      bg.style.display='none'; 
+    },
     onChange: function(value, ind, opt) {
         switch (ind) {
           case 0:
@@ -866,7 +1031,7 @@ new Vue({
     theme: {
       themes: {
         light: {
-          nicetext: "#ccd6dc"
+          nicetext: "#ccd6dc",
         }
       },
       options: {
