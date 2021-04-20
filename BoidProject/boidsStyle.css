@@ -7,7 +7,7 @@
 
 body {
   position: relative;
-  background-color: var(main-bg-color);
+  background-color: var(main-bg-color) !important;
 }
 
 .sound-buttons {
@@ -74,6 +74,13 @@ body {
   z-index: 1;
   overflow: auto !important;
 }
+#filler {
+  position: fixed;
+  width: 75vw;
+  left: 0px;
+  height: 100%;
+  background-color: var(--main-bg-color);
+}
 
 #fifth, #majThird, #minThird{
   color: inherit;
@@ -99,11 +106,16 @@ program is 75% of the window size. So some math.  */
   /* background-color: green; */
   bottom: 10px;
   width: 74vw;
-  height: 7vh; 
+  height: 7vh;
   overflow: hidden;
 }
 img {
   height: 30vw;
   width: 30vw;
   transform: translate( 27vw, -30vh)
+}
+
+#initiate {
+  position: absolute;
+
 }
