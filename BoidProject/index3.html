@@ -134,6 +134,7 @@ input[type=number] {
     boids.accelerationLimit = 3;
     boids.speedLimit = 12;
     boids.mass = 10;
+    boids.initialRad = 100;
 
     let eyeDist  = boids.eyesightDistance;
     let sepForce = boids.separationForce;
@@ -163,6 +164,8 @@ input[type=number] {
       let parts = []; //parts and points are helper fields to load the files.
       let points = [];
     let finLoading = false;
+
+
 
     // let count = 180;
 
@@ -208,13 +211,41 @@ input[type=number] {
     <v-overlay :value="overlay">
       <v-card
         class="mx-auto"
-        width="80vw"
+        width="60vw"
         elevation="8"
       >
-      <v-card-title class="font-weight-thin"> BOID MUSIC PROGRAM - Set Initial Parameters </v-card-title>
+      <v-card-title class="font-weight-thin"> BOID MUSIC PROGRAM </v-card-title>
       <v-card-text>
         <v-container>
         <v-row>
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-text-field
+              v-model="count.val"
+              label="Boid Count"
+              type="number"
+              :rules="numberRule"
+              @change="oneTimeSettings($event, 1)"
+            ></v-text-field>
+          </v-col>
+
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-text-field
+              v-model="initialRad.val"
+              label="Initial Radius"
+              type="number"
+              :rules="numberRule"
+              @change="oneTimeSettings($event, 2)"
+            ></v-text-field>
+          </v-col>
+
           <v-col
             cols="12"
             sm="6"
@@ -770,6 +801,8 @@ input[type=number] {
           <v-btn class="mx-3" fab dark small :value="1" title="Load lattice file 1"> I </v-btn>
           <v-btn class="mx-3" fab dark small :value="2" title="Load lattice file 2"> II </v-btn>
           <v-btn class="mx-3" fab dark small :value="3" title="Load lattice file 3"> III </v-btn>
+          <v-btn class="mx-3" fab dark small :value="4" title="Load lattice file 4"> IV </v-btn>
+          <v-btn class="mx-3" fab dark small :value="5" title="Load lattice file T"> T </v-btn>
           </v-btn-toggle>
         </div>
       </v-row>
@@ -813,6 +846,8 @@ const App = {
       min: -50,
       max: 90,
       range: [-20, 70],
+      count: {val: 120},
+      initialRad: {val: 100},
       boidMass: { val: 10 },
         boidMassSlider: {val: 10},
       eye_dist: { val: 30},
@@ -837,6 +872,16 @@ const App = {
       this.overlay = false;
       let bg = document.querySelector('#filler');
       bg.style.display='none';
+    },
+    oneTimeSettings: function( value, ind ){
+      switch (ind) {
+        case 1: // count
+          count = value;
+        break;
+        case 2: // initial radius
+          boids.initialRad = value;
+        break;
+      }
     },
     onChange: function(value, ind, opt) {
         switch (ind) {
@@ -1025,7 +1070,18 @@ const App = {
       // Pd.send( "phaseModHz" , [parseFloat(value)] );
     },
     loadFile: function( value ){
+      // Stops sound if there is sound being played
+      for (let i=0; i<count; i++){
+        linArr[i].i(0).message([0]);
+      }
+      listening = 0;
+      finLoading = false;
+
       fileVer = value;
+      chooseFile( fileVer );
+      // listening = 1;
+
+
     }
   }
 }
