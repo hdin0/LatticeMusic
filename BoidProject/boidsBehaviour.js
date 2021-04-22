@@ -3,16 +3,13 @@ import Stats from 'https://threejs.org/examples/jsm/libs/stats.module.js';
 import { OrbitControls } from 'https://threejs.org/examples/jsm/controls/OrbitControls.js';
 import { GUI } from 'https://threejs.org/examples/jsm/libs/dat.gui.module.js';
 
+
 let altWidt = 0.75;
 let altHeig = 1;
 let inWidth = window.innerWidth * altWidt;
 let inHeight = window.innerHeight * altHeig;
 
-let latticePitchContents = [];
-let latticePitchIntegerContents = new Array( 64000 );
-  let parts = []; //parts and points are helper fields to load the files.
-  let points = [];
-let finLoading = false;
+
 let clicked = false;
 
 // size
@@ -82,23 +79,50 @@ let intersects = [];
 const clock = new THREE.Clock();
 let tickCounter = 0;
 
+let c0 = new THREE.Color( 0xef1011 );
+let c1 = new THREE.Color( 0xe67b19 );
+let c2 = new THREE.Color( 0xe4d41b );
+let c3 = new THREE.Color( 0x7ce718 );
+let c4 = new THREE.Color( 0x1de21d );
+let c5 = new THREE.Color( 0x1ee192 );
+let c6 = new THREE.Color( 0x10efee );
+let c7 = new THREE.Color( 0x1984e6 );
+let c8 = new THREE.Color( 0x1b2be4 );
+let c9 = new THREE.Color( 0x8318e7 );
+let c10 = new THREE.Color( 0x400040 );
+let c11 = new THREE.Color( 0xe11e6d );
+let c12 = new THREE.Color( 0xef1011 );
+let c13 = new THREE.Color( 0x002330 );
+
+
 function init() {
 
   let i = 0;
   while (i < (count)){
-    let x0 = Math.floor(Math.random() * (eyeDist*2) + (slen*0.3));
-    let y0 = Math.floor(Math.random() * (eyeDist*2) + (slen*0.3));
-    let z0 = Math.floor(Math.random() * (eyeDist*2) + (slen*0.3));
+    let accept = false;
+    let x0 = 0; let y0 = 0; let z0 = 0;
+    let offset = slen*0.5; //this shifts the origin of the boids to the center of our cube.
+    while (accept == false){
+      x0 = Math.random()*2.0-1.0;
+      y0 = Math.random()*2.0-1.0;
+      z0 = Math.random()*2.0-1.0;
+      x0 = x0*boids.initialRad;
+      y0 = y0*boids.initialRad;
+      z0 = z0*boids.initialRad;
+      if (hypot3(x0,y0,z0) < boids.initialRad){
+        accept = true;
+      }
+      x0 = x0+offset;
+      y0 = y0+offset;
+      z0 = z0+offset;
+    }
     matrix.setPosition( x0, y0, z0 );
     boids.velocity.push( new THREE.Vector3( 0.1, 0.1, 0.1 ) );
     boids.accel.push( new THREE.Vector3( 0.1, 0.1, 0.1 ) );
     mesh.setMatrixAt( i, matrix );
       let pInt = getPitchInteger( convertToLatticeInd( x0, y0, z0 ) );
     mesh.setColorAt( i, getColor( pInt ) );
-    // mesh.setColorAt( i, color.setHex( Math.random() * 0xffffff ) );
-
     i++
-
   }
   scene.add( mesh );
 
@@ -108,6 +132,8 @@ function init() {
 
   // renderer.domElement.addEventListener( 'mousedown', onMouseDown );
 }
+init();
+animate();
 
 // let stats = new Stats();
 // document.body.appendChild( stats.dom );
@@ -490,7 +516,7 @@ function animate() {
   requestAnimationFrame(animate);
   if (tick()){
     move();
-//     console.log(1);
+    // console.log(1);
   }
   if (finLoading) {
     vue_det.message = mostCommonPitch();
@@ -510,30 +536,30 @@ function render() {
 
 //
 
-/* LOADS FILE */
-async function loadFile(url) {
-  const req = await fetch(url);
-  return req.text();
-}
-
-function parseData( text ) {
-  //split into lines
-  text.split('\n').forEach( (line) => {
-    parts.push( line );
-  });
-  return parts;
-};
-
-async function handleData( file ){
-  latticePitchContents = await loadFile(file).then(parseData); //to fix later. Surely it's not efficient to have to load and wait everytime for the promise to finish.
-  for(let i = 0; i< latticePitchContents.length; i++){
-    latticePitchIntegerContents[i] = getPitchInteger(latticePitchContents[i]);
-  }
-  finLoading = true;
-  init();
-  animate();
-}
-handleData('./sept11pValuesByLine.txt')
+// /* LOADS FILE */
+// async function loadFile(url) {
+//   const req = await fetch(url);
+//   return req.text();
+// }
+//
+// function parseData( text ) {
+//   //split into lines
+//   text.split('\n').forEach( (line) => {
+//     parts.push( line );
+//   });
+//   return parts;
+// };
+//
+// async function handleData( file ){
+//   latticePitchContents = await loadFile(file).then(parseData); //to fix later. Surely it's not efficient to have to load and wait everytime for the promise to finish.
+//   for(let i = 0; i< latticePitchContents.length; i++){
+//     latticePitchIntegerContents[i] = getPitchInteger(latticePitchContents[i]);
+//   }
+//   finLoading = true;
+//   init();
+//   animate();
+// }
+// handleData('./sept11pValuesByLine.txt')
 // body.getElementById( "")
 // init();
 
@@ -545,46 +571,46 @@ handleData('./sept11pValuesByLine.txt')
 function getColor( int ) {
   switch(int) {
     case 0:
-      return (new THREE.Color( 0xef1011 ));
+      return ( c0 );
       break;
     case 1:
-      return (new THREE.Color( 0xe67b19 ));
+      return ( c1 );
       break;
     case 2:
-      return (new THREE.Color( 0xe4d41b ));
+      return ( c2 );
       break;
     case 3:
-      return (new THREE.Color( 0x7ce718 ));
+      return ( c3 );
       break;
     case 4:
-      return (new THREE.Color( 0x1de21d ));
+      return ( c4 );
       break;
     case 5:
-      return( new THREE.Color( 0x1ee192 ));
+      return( c5 );
       break;
     case 6:
-      return (new THREE.Color( 0x10efee ));
+      return ( c6 );
       break;
     case 7:
-      return (new THREE.Color( 0x1984e6 ));
+      return ( c7 );
       break;
     case 8:
-      return (new THREE.Color( 0x1b2be4 ));
+      return ( c8 );
       break;
     case 9:
-      return (new THREE.Color( 0x8318e7 ));
+      return ( c9 );
       break;
     case 10:
-      return (new THREE.Color( 0x400040 ));
+      return ( c10 );
       break;
     case 11:
-      return (new THREE.Color( 0xe11e6d ));
+      return ( c11 );
       break;
     case 12:
-      return (new THREE.Color( 0xef1011 ));
+      return ( c12 );
       break;
     default:
-      return (new THREE.Color( 0x002330 ));
+      return ( c13 );
   }
 }
 
@@ -708,50 +734,50 @@ function mostCommonPitchInteger() {
   return mostFrequent;
 }
 
-function getPitchInteger( latticePitchIndex ) {
-  let val = latticePitchContents[latticePitchIndex];
-  // console.log(val);
-  switch (Math.round(val*12)) {
-    case 0:
-      return 0;
-      break;
-    case 1:
-      return 1;
-      break;
-    case 2:
-      return 2;
-      break;
-    case 3:
-      return 3;
-      break;
-    case 4:
-      return 4;
-      break;
-    case 5:
-      return 5;
-      break;
-    case 6:
-      return 6;
-      break;
-    case 7:
-      return 7;
-      break;
-    case 8:
-      return 8;
-      break;
-    case 9:
-      return 9;
-      break;
-    case 10:
-      return 10;
-      break;
-    case 11:
-      return 11;
-      break;
-    case 12:
-      return 0;
-  }
-}
+// function getPitchInteger( latticePitchIndex ) {
+//   let val = latticePitchContents[latticePitchIndex];
+//   // console.log(val);
+//   switch (Math.round(val*12)) {
+//     case 0:
+//       return 0;
+//       break;
+//     case 1:
+//       return 1;
+//       break;
+//     case 2:
+//       return 2;
+//       break;
+//     case 3:
+//       return 3;
+//       break;
+//     case 4:
+//       return 4;
+//       break;
+//     case 5:
+//       return 5;
+//       break;
+//     case 6:
+//       return 6;
+//       break;
+//     case 7:
+//       return 7;
+//       break;
+//     case 8:
+//       return 8;
+//       break;
+//     case 9:
+//       return 9;
+//       break;
+//     case 10:
+//       return 10;
+//       break;
+//     case 11:
+//       return 11;
+//       break;
+//     case 12:
+//       return 0;
+//   }
+// }
 
 /* WEBPD */
 
