@@ -161,9 +161,9 @@ input[type=number] {
 
     let latticePitchContents = [];
     let latticePitchIntegerContents = new Array( 64000 );
-      let parts = []; //parts and points are helper fields to load the files.
-      let points = [];
+      let parts = []; //parts is a helper fields to load the files.
     let finLoading = false;
+    resetP = 0; //toggles on and off, resets position of boids.
 
 
 
@@ -242,7 +242,7 @@ input[type=number] {
               label="Initial Radius"
               type="number"
               :rules="numberRule"
-              @change="oneTimeSettings($event, 2)"
+              @change="miscControls($event, 2)"
             ></v-text-field>
           </v-col>
 
@@ -392,7 +392,30 @@ input[type=number] {
       <h2 title="You can hover over most text, or text fields to read extra instructions. To type extremely large or small numbers, use e notation. ex. 10^6 = 10e6, or 10^-6 = 10e-6"
       >Controls:</h2>
       </v-row>
+      <v-row no-gutters>
+        <v-col cols="12" sm="6" md="4">
+        <v-text-field
+          v-model="initialRad.val"
+          label="Initial Radius"
+          min="0"
+          type="number"
+          color="rgba(204, 214, 220, 1)"
+          class="text-normal"
+          title="Sets Initial Radius of boids when you reset their positions."
+          @change="miscControls($event, 2,)"
+        >
+        </v-text-field>
+        </v-col>
+        <v-col cols="12" sm="6" md="8">
+        <v-btn class="mx-3" dark outlined small absolute right @click="miscControls(0,1)"> Reset Positions </v-btn>
+        </v-col>
+      </v-row>
 
+
+      <v-row no-gutters>
+      </v-row>
+      <v-row no-gutters>
+      </v-row>
       <!-- <v-row no-gutters>
       <v-col cols="12" sm="6" md="4">
       <span title="Total number of Boids">Count</span>
@@ -872,13 +895,20 @@ const App = {
       let bg = document.querySelector('#filler');
       bg.style.display='none';
     },
+    miscControls: function( value, ind ){
+      switch (ind) {
+        case 1:
+        resetP = 1;
+        break;
+        case 2:
+          boids.initialRad = value;
+        break;
+      }
+    },
     oneTimeSettings: function( value, ind ){
       switch (ind) {
         case 1: // count
           count = value;
-        break;
-        case 2: // initial radius
-          boids.initialRad = value;
         break;
       }
     },
