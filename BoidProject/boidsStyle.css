@@ -104,15 +104,19 @@ program is 75% of the window size. So some math.  */
   position: absolute;
   z-index: 1;
   /* background-color: green; */
-  bottom: 10px;
+  /* top: 20px;  */
+  bottom: 0px;
   width: 74vw;
-  height: 7vh;
+  height: 10vh;
+  max-height: 10vh;
   overflow: hidden;
 }
 img {
-  height: 30vw;
-  width: 30vw;
-  transform: translate( 27vw, -30vh)
+  /* height: 30vw; */
+  height: 450px;
+  width: 400px;
+  /* transform: translate( 27vw, -29vh) */
+  transform: translate( 27vw, -220px);
 }
 
 #initiate {
