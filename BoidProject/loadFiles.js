@@ -14,15 +14,9 @@ function parseData( text ) {
 
 async function handleData( file ){
   latticePitchContents = new Array( 64000 );
+  parts = [];
   latticePitchContents = await loadFile(file).then(parseData);
-  for(let i = 0; i< latticePitchContents.length; i++){
-    latticePitchIntegerContents[i] = getPitchInteger(latticePitchContents[i]);
-  }
   finLoading = true;
-  console.log(fileVer);
-  // init();
-  // animate();
-  // console.log(1);
 }
 handleData('./lattice_files/sept11pValuesByLine.txt');
 
@@ -73,23 +67,26 @@ function getPitchInteger( latticePitchIndex ) {
 
 // This is only used for index3, changing files.
 function chooseFile( ind ){
+console.log(latticePitchContents[0])
   switch (ind){
     case 1:
-      handleData('./lattice_files/sept11pValuesByLine.txt').then(liston());
+      handleData('./lattice_files/sept11pValuesByLine.txt').then(liston);
     break;
     case 2:
-      handleData('./lattice_files/sept14pValuesByLine.txt') //nrep 20
+      handleData('./lattice_files/sept14pValuesByLine.txt').then(liston); //nrep 20
     break;
     case 3:
-      handleData('./lattice_files/sept8pValuesByLine.txt') //nrep 30
+      handleData('./lattice_files/sept8pValuesByLine.txt').then(liston) //nrep 30
     break;
     case 4:
       handleData('./lattice_files/a9pValuesByLine.txt') //nrep 60
     break;
     case 5:
-      handleData('./lattice_files/testpValuesByLine.txt').then(liston()) //nrep 60
+      handleData('./lattice_files/testpValuesByLine.txt').then(liston)
     break;
   }
+
+
 }
 
 // I don't think I need a function for this? used only in chooseFile function.
