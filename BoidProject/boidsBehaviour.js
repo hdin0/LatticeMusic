@@ -287,6 +287,49 @@ function move() {
   }
 }
 
+function refreshColors() {
+  console.log(2);
+  for (let i = 0; i < count; i++ ) {
+    mesh.getMatrixAt( i, matrix );
+    position.setFromMatrixPosition( matrix );
+    let pInt = getPitchInteger( convertToLatticeInd( position.x, position.y, position.z ) );
+    mesh.setColorAt( i, getColor( pInt ) );
+    mesh.instanceColor.needsUpdate = true;
+  }
+}
+function resetPositions() {
+  console.log(2);
+
+  for (let i = 0; i < count; i++ ) {
+    let accept = false;
+    let x0 = 0; let y0 = 0; let z0 = 0;
+    let offset = slen*0.5; //this shifts the origin of the boids to the center of our cube.
+    while (accept == false){
+      x0 = Math.random()*2.0-1.0;
+      y0 = Math.random()*2.0-1.0;
+      z0 = Math.random()*2.0-1.0;
+      x0 = x0*boids.initialRad;
+      y0 = y0*boids.initialRad;
+      z0 = z0*boids.initialRad;
+      if (hypot3(x0,y0,z0) < boids.initialRad){
+        accept = true;
+      }
+      x0 = x0+offset;
+      y0 = y0+offset;
+      z0 = z0+offset;
+    }
+    matrix.setPosition( x0, y0, z0 );
+    boids.velocity.push( new THREE.Vector3( 0.1, 0.1, 0.1 ) );
+    boids.accel.push( new THREE.Vector3( 0.1, 0.1, 0.1 ) );
+    mesh.setMatrixAt( i, matrix );
+      let pInt = getPitchInteger( convertToLatticeInd( x0, y0, z0 ) );
+    mesh.setColorAt( i, getColor( pInt ) );
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.instanceColor.needsUpdate = true;
+  }
+  resetP = 0; 
+}
+
 async function collectAndPlay( num, ){
   let plist = new Array( num );
   for (let i = 0; i<num; i++){
@@ -495,22 +538,6 @@ function tick(){
   return val;
 }
 
-function changeFile(){
-  if (fileVer != settings.fileVer){
-    switch (fileVer){
-      case 1:
-        handleData('./sept11pValuesByLine.txt')
-      break;
-      case 2:
-        // do nothing as of now
-      break;
-      case 3:
-        // do nothing as of now.
-      break;
-    }
-  }
-}
-
 function animate() {
 
   requestAnimationFrame(animate);
@@ -521,7 +548,9 @@ function animate() {
   if (finLoading) {
     vue_det.message = mostCommonPitch();
   }
-  changeFile();
+  if (resetP) {
+    resetPositions();
+  }
   // stats.update();
   controls.update();
   render();
