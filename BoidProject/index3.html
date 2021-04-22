@@ -802,7 +802,6 @@ input[type=number] {
           <v-btn class="mx-3" fab dark small :value="2" title="Load lattice file 2"> II </v-btn>
           <v-btn class="mx-3" fab dark small :value="3" title="Load lattice file 3"> III </v-btn>
           <v-btn class="mx-3" fab dark small :value="4" title="Load lattice file 4"> IV </v-btn>
-          <v-btn class="mx-3" fab dark small :value="5" title="Load lattice file T"> T </v-btn>
           </v-btn-toggle>
         </div>
       </v-row>
@@ -1079,9 +1078,8 @@ const App = {
 
       fileVer = value;
       chooseFile( fileVer );
+      // refreshColors();
       // listening = 1;
-
-
     }
   }
 }
