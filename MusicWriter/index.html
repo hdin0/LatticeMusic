@@ -7,6 +7,28 @@
     <script src="js/jquery.js"></script>
     <script src="js/webpd-latest.js"></script>
     <script src="js/svg.min.js"></script>
+<!-- preload svg files -->
+    <script>
+    let staff_svg;
+    let quarter_svg = null;
+    let lines_svg = null;
+
+    $.get('./assets/staff.svg', function(data, status){
+      staff_svg = data;
+    });
+
+
+
+    // var ajax = new XMLHttpRequest();
+    // ajax.open('GET','./assets/staff.svg',true);
+    // ajax.send()
+    // ajax.onload=function(e){
+    //   console.log(ajax.responseText)
+    //   staff_svg = ajax.responseText;
+    //
+    // }
+
+    </script>
 
 </head>
 <body>
