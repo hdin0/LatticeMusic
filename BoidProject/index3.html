@@ -59,10 +59,13 @@ input[type=number] {
     var patch = Pd.createPatch();
     let oscArr = new Array( count );
     let linArr = new Array( count );
+    let scaArr = new Array( count );
     for (let i=0; i<count; i++){
       oscArr[i] = patch.createObject( 'osc~', [0]);
       linArr[i] = patch.createObject( 'line~' );
+      scaArr[i] = patch.createObject( '*~', [1] );
       linArr[i].o(0).connect( oscArr[i].i(0) );
+      oscArr[i].o(0).connect(scaArr[i].i(0) );
     }
     let dac = patch.createObject( 'dac~');
     let sigAdd = patch.createObject( '+~' );
@@ -143,6 +146,7 @@ input[type=number] {
     let sepDist  = eyeDist * 0.5
     let cohDist  = boids.cohesionDistance;
     let aliDist  = boids.alignmentDistance;
+    let thetaLim = 0.7*Math.PI;
 
     // music fields.
     let searching = false;
@@ -206,7 +210,19 @@ input[type=number] {
  <!-- CONTROL PANEL -->
 <div id="app">
   <script type="text/x-template" id="app-template">
-  <v-app>
+    <v-app>
+
+      <div id="init">
+    <v-btn
+      absolute left bottom
+      small
+      text
+      color="primary"
+      @click="overlay = !overlay"
+    >
+      Reset Parameters
+    </v-btn>
+    </div>
 
     <v-overlay :value="overlay">
       <v-card
@@ -271,6 +287,20 @@ input[type=number] {
               type="number"
               :rules="numberRule"
               @change="onChange($event, 1,1)"
+            ></v-text-field>
+          </v-col>
+
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-text-field
+              v-model="s_angle.val"
+              label="Sight Angle Restriction (In Degrees)"
+              type="number"
+              :rules="numberRule"
+              @change="onChange($event, 10,1)"
             ></v-text-field>
           </v-col>
 
@@ -385,6 +415,62 @@ input[type=number] {
         </v-card-actions>
       </v-card>
     </v-overlay>
+    <!-- end of init tag -->
+  </div>
+
+  <div id="info">
+    <v-btn
+      absolute left bottom
+      small
+      text
+      color="primary"
+      @click="overlay2 = !overlay2"
+    >
+      More Information
+    </v-btn>
+    </div>
+
+    <v-overlay :value="overlay2">
+      <v-card
+     class="mx-auto"
+     width="80vw"
+     elevation="8"
+    >
+     <v-card-title
+       class="font-weight-thin">
+       BOID MUSIC
+     </v-card-title>
+
+     <v-card-text
+       class="text-left font-weight-thin"
+       id="over-content"
+     >
+     <p>
+       This project was born out of the idea to use the bottom-up theory of music to create a new method of algorithmic composition. We assigned to each position a specific pitch, where each pitch was obtained from
+       the results of our numerical simulations. As the boids travel through the domain, we reobtain the pitch values, and that is what is played. Visually, the colors represent a particular pitch index from 0 to 11 (A twelve note system).
+       The pitch indices relate to each other in the traditional western sense. For example, 0 to 4 is a major third and 1 to 5 is also a major third ()
+       <br>
+       Descriptions of each control field can be seen by hovering over either the text, or text field area.
+
+     </p>
+
+     </v-card-text>
+
+     <v-card-actions>
+       <v-btn
+        text
+        color="primary"
+        @click="overlay2 = false"
+      >
+        Close
+      </v-btn>
+     </v-card-actions>
+    </v-card>
+    </v-overlay>
+
+<!-- end of info tag -->
+
+
 
     <!-- sliders -->
     <v-container>
@@ -414,24 +500,6 @@ input[type=number] {
 
       <v-row no-gutters>
       </v-row>
-      <v-row no-gutters>
-      </v-row>
-      <!-- <v-row no-gutters>
-      <v-col cols="12" sm="6" md="4">
-      <span title="Total number of Boids">Count</span>
-      </v-col>
-      <v-col cols="12" md="8">
-      <v-slider
-        max="300"
-        min="0"
-        class="ma-0 pa-0"
-        hide-details
-        thumb-label
-        @change="onChange($event, 0)"
-        value = 200
-      ></v-slider>
-      </v-col>
-      </v-row> -->
 
       <v-row no-gutters>
       <v-col cols="12" sm="6" md="3">
@@ -485,6 +553,36 @@ input[type=number] {
             hide-details
             class="align-center"
             @change="onChange($event, 1,2)"
+          >
+          </v-slider>
+        </v-col>
+      </v-row>
+
+      <v-row no-gutters>
+      <v-col cols="12" sm="6" md="3">
+        <v-text-field
+          v-model="s_angle.val"
+          value="s_angle.val"
+          label="Sight Restriction Angle"
+          title="Sight Restriction Angle, a limit to which boids may see other boids around"
+          min="1"
+          max="180"
+          type="number"
+          color="rgba(204, 214, 220, 1)"
+          class="text-normal"
+          @change="onChange($event, 10,1)"
+        >
+        </v-text-field>
+      </v-col>
+        <v-col cols="12" sm="6" md="9">
+          <v-slider
+            v-model="s_angle.val"
+            value="s_angle.val"
+            min="1"
+            max="180"
+            hide-details
+            class="align-center"
+            @change="onChange($event, 10,2)"
           >
           </v-slider>
         </v-col>
@@ -732,7 +830,10 @@ input[type=number] {
         @change="distChange($event)"
         ></v-switch>
         </v-col>
-        <v-col cols="12" sm="6" md="6">
+        <!-- <v-col cols="12" sm="6" md="6">
+
+        </v-col>  -->
+        <!-- <v-col cols="12" sm="6" md="6">
           <span v-if="switch2" title="wip">
             Modulation wrt Distance
           </span>
@@ -743,7 +844,7 @@ input[type=number] {
         v-model="switch2"
         inset
         ></v-switch>
-        </v-col>
+        </v-col> -->
       </v-row>
 
       <v-row no-gutters>
@@ -778,7 +879,7 @@ input[type=number] {
         </v-col>
       </v-row>
 
-      <v-row no-gutters>
+      <!-- <v-row no-gutters>
         <v-col cols="12" sm="6" md="8" title="wip">
           <span> Set Modulation Frequency in Hz:</span>
         </v-col>
@@ -814,7 +915,7 @@ input[type=number] {
           >
         </v-text-field>
       </v-col>
-      </v-row>
+      </v-row> -->
 
       <v-row no-gutters align="center" justify="center">
         <div class="text-center">
@@ -833,6 +934,8 @@ input[type=number] {
       </v-row>
 
     </v-container>
+
+
   </v-app>
   </script>
   <p>if you see this, something has gone wrong. Switching your browser might work</p>
@@ -847,6 +950,7 @@ const App = {
     return {
       absolute: true,
       overlay: true,
+      overlay2: false,
       numberRule: [
       v => !!v || 'Number is Required',
       ],
@@ -879,6 +983,8 @@ const App = {
         coh_forceSlider: {val: 1},
       ali_force: {val: 80},
         ali_forceSlider: {val: 80},
+      s_angle: {val: 40},
+        s_angleSlider: {val: 40},
       modfreq: {val: 0},
       modAmon: {val: 0},
       toggle_exclusive: 1,
@@ -997,6 +1103,9 @@ const App = {
           case 9:
             updateRate = value;
             break;
+          case 10:
+            thetaLim = (value/180)*Math.PI;
+          break;
           }
       },
     setNewValue( ind, value ){
@@ -1134,7 +1243,7 @@ new Vue({
 </script>
 
 <!-- MORE INFORMATION OVERLAY : Explain what's going on here.  -->
-<div id="over">
+<!-- <div id="over">
  <v-app id="inspire">
    <div class="text-center">
      <v-btn
@@ -1186,7 +1295,7 @@ new Vue({
      </v-overlay>
    </div>
  </v-app>
-</div>
+</div> -->
 
 <!-- 11 colors -->
 <div id="colorbar">
@@ -1195,7 +1304,7 @@ new Vue({
   <!-- </svg> -->
 </div>
 
-<script>
+<!-- <script>
 var over = new Vue({
  el: '#over',
  vuetify: new Vuetify(),
@@ -1204,6 +1313,6 @@ var over = new Vue({
    overlay: false,
  }),
 })
-</script>
+</script> -->
 </body>
 </html>
