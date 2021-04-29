@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+<head>
+    <title>Live Music Notating</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="styles.css">
+    <script src="js/jquery.js"></script>
+    <script src="js/webpd-latest.js"></script>
+    <script src="js/svg.min.js"></script>
+
+</head>
+<body>
+  <!-- Necessary Fields -->
+  <script>
+    //sound
+    let latticePitchContents = new Array( 64000 );
+    let parts = [];
+    let finLoading = 0;
+    let listening = 0;
+    let bpm = 1000;
+    let set_autoPlay = 0;
+    let f0 = 220;
+    let counter = 0;
+
+    //sight stuff
+    let noteH = 42;
+    let noteW = 15;
+    let cw = 1;
+    let ch = 1;
+    let midi = 0;
+  </script>
+
+  <input id="intTextBox">
+  <button id="bpm" onclick="changeBPM()">Set BPM</button>
+  <input>Starting Note</input>
+  <button id="startButton">Start</button>
+
+
+  <script>
+    var button = document.getElementById('startButton')
+    Pd.startOnClick(button, function() {
+      console.log('clicked!')
+      listening = 1;
+    })
+    let patch = Pd.createPatch();
+    let linArr = patch.createObject( 'line~', [440] );
+    let osc = patch.createObject( 'osc~', [440] );
+    let clip = patch.createObject( 'clip~', [-1, 1] );
+    let dac = patch.createObject( 'dac~' );
+
+    // linArr.o(0).connect( osc.i(0) );
+    osc.o(0).connect(clip.i(0));
+    clip.o(0).connect(dac.i(0));
+    clip.o(0).connect(dac.i(1));
+
+  </script>
+  <script src="loadFiles.js"></script>
+  <script src="notate.js"></script>
+
+  <button onclick="addNew()">addNew</button>
+
+  <div id="drawing" class="sideScroll">
+    <script>
+      var draw = SVG().addTo('#drawing'); //initialize SVG.js
+      draw.viewbox( 5,5,1000,1000);
+    </script>
+  </div>
+
+<script>
+// Restricts input for each element in the set of matched elements to the given inputFilter.
+(function($) {
+  $.fn.inputFilter = function(inputFilter) {
+    return this.on("input keydown keyup mousedown mouseup select contextmenu drop", function() {
+      if (inputFilter(this.value)) {
+        this.oldValue = this.value;
+        this.oldSelectionStart = this.selectionStart;
+        this.oldSelectionEnd = this.selectionEnd;
+      } else if (this.hasOwnProperty("oldValue")) {
+        this.value = this.oldValue;
+        this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+      } else {
+        this.value = "";
+      }
+    });
+  };
+}(jQuery));
+// https://stackoverflow.com/questions/995183/how-to-allow-only-numeric-0-9-in-html-inputbox-using-jquery/995193#995193
+
+// Install input filters.
+$("#intTextBox").inputFilter(function(value) {
+  return /^-?\d*$/.test(value); });
+
+function changeBPM(){
+  bpm = parseInt($("#intTextBox").val());
+  console.log(bpm);
+}
+</script>
+
+
+
+</body>
+</html>
