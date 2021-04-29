@@ -26,20 +26,15 @@ function convertToMidi( f ){
 
 function addNew( midi ){
   if (cw==1){
-    let staff = SVG().addTo('#drawing');
-    draw.use('treble_staff','./assets/staff.svg').move(cw,0);
-    draw.use('lines','./assets/lines.svg').move(283.511,0);
-    draw.use('lines','./assets/lines.svg').move(2*283.511,0);
-draw.use('treble_staff','./assets/staff.svg').move(cw,0);
-    // console.log(staff_ele);
-    // staff_ele.resize(100,200);
+    draw.svg(staff_svg)
+    // draw.use('treble_staff','./assets/staff.svg').move(cw,100);
 
     console.log(draw);
 
   }
-  let note = new SVG().addTo('#drawing');
-  note.size(15,42);
-  draw.use('svg5','./assets/quarter2.svg').move((noteW*cw)+5,(49-midi)*2+(noteH*ch+5)); //49 is A concert pitch, 440, the higher the number, the lower on the screen (y).
+  // let note = new SVG().addTo('#drawing');
+  // note.size(15,42);
+  draw.use('svg5','./assets/quarter.svg').move((noteW*cw)+5,(49-midi)*2+(noteH*ch+5)); //49 is A concert pitch, 440, the higher the number, the lower on the screen (y).
   if ((noteW*cw) > (window.innerWidth-300)){
     cw = 1;
     ch++;
