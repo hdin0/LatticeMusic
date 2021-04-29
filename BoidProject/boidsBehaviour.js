@@ -189,7 +189,6 @@ function calcChange( inx, iny, inz ) {
   // why have three distance parameters.
   let diff = new THREE.Vector3();
   let dist = 0;
-  let thetaLim = 0.7*Math.PI;
   for (let i = 0; i < count; i++ ) {
     sforceX = 0; sforceY = 0; sforceZ = 0;
     cforceX = 0; cforceY = 0; cforceZ = 0;
@@ -327,7 +326,7 @@ function resetPositions() {
     mesh.instanceMatrix.needsUpdate = true;
     mesh.instanceColor.needsUpdate = true;
   }
-  resetP = 0; 
+  resetP = 0;
 }
 
 async function collectAndPlay( num, ){
@@ -828,20 +827,21 @@ function triggerReceive( boidIndex, posIndex ) {
 }
 function playLoop(vals, it) {
 
-  if (oscArr.length < count) {
-    let extra = count-oscArr.length;
-    for (let i=0; i<extra; i++ ){
-      oscArr.push(patch.createObject( 'osc~', [0]));
-      linArr.push(patch.createObject( 'line~' ));
-      linArr[linArr.length-1].o(0).connect( oscArr[oscArr.length-1].i(0) )
-    }
-  } else if (oscArr.length > count) {
-    let extra = oscArr.length-count;
-    for (let i = 0; i<extra; i++){
-      oscArr.pop();
-      linArr.pop();
-    }
-  }
+// can ignore this for now, uncomment when i make a slider for comments.
+  // if (oscArr.length < count) {
+  //   let extra = count-oscArr.length;
+  //   for (let i=0; i<extra; i++ ){
+  //     oscArr.push(patch.createObject( 'osc~', [0]));
+  //     linArr.push(patch.createObject( 'line~' ));
+  //     linArr[linArr.length-1].o(0).connect( oscArr[oscArr.length-1].i(0) )
+  //   }
+  // } else if (oscArr.length > count) {
+  //   let extra = oscArr.length-count;
+  //   for (let i = 0; i<extra; i++){
+  //     oscArr.pop();
+  //     linArr.pop();
+  //   }
+  // }
 
   for (let i=0; i<count; i++){
     let v = vals[i];
@@ -850,7 +850,8 @@ function playLoop(vals, it) {
 
   let j = 0;
   while (j<count) {
-    oscArr[j].o(0).connect(delwrite.i(0));
+    scaArr[j].i(0).message([Math.exp((-5*10^-8)*vals[j])]);
+    scaArr[j].o(0).connect(delwrite.i(0));
     j++;
   }
 
