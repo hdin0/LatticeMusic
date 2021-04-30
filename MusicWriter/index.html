@@ -3,35 +3,28 @@
 <head>
     <title>Live Music Notating</title>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
     <link rel="stylesheet" href="styles.css">
     <script src="js/jquery.js"></script>
     <script src="js/webpd-latest.js"></script>
-    <script src="js/svg.min.js"></script>
+    <script src="js/svg4everybody.min.js"></script>
+    <script src="js/svg4everybody.legacy.min.js"></script>
+
 <!-- preload svg files -->
     <script>
-    let staff_svg;
-    let quarter_svg = null;
-    let lines_svg = null;
-
-    $.get('./assets/staff.svg', function(data, status){
-      staff_svg = data;
-    });
-
-
-
-    // var ajax = new XMLHttpRequest();
-    // ajax.open('GET','./assets/staff.svg',true);
-    // ajax.send()
-    // ajax.onload=function(e){
-    //   console.log(ajax.responseText)
-    //   staff_svg = ajax.responseText;
-    //
-    // }
-
+    if (location.hash !== '#nofill') {
+      svg4everybody();
+    }
     </script>
 
 </head>
 <body>
+
+  <svg title="quarter" role="presentation" >
+    <use xlink:href="./assets/quarter2.svg#quarter" x="-10"/>
+    <!-- positino is -10, bc i want to hide it off the screen -->
+  </svg>
   <!-- Necessary Fields -->
   <script>
     //sound
@@ -45,17 +38,20 @@
     let counter = 0;
 
     //sight stuff
-    let noteH = 42;
-    let noteW = 15;
+    // 20 is what i set width and height in styles.css
+    let noteH = 20;
+    let noteW = 20;
     let cw = 1;
     let ch = 1;
     let midi = 0;
   </script>
 
+  <div id="controls">
   <input id="intTextBox">
   <button id="bpm" onclick="changeBPM()">Set BPM</button>
   <input>Starting Note</input>
   <button id="startButton">Start</button>
+  </div>
 
 
   <script>
@@ -79,14 +75,6 @@
   <script src="loadFiles.js"></script>
   <script src="notate.js"></script>
 
-  <button onclick="addNew()">addNew</button>
-
-  <div id="drawing" class="sideScroll">
-    <script>
-      var draw = SVG().addTo('#drawing'); //initialize SVG.js
-      draw.viewbox( 5,5,1000,1000);
-    </script>
-  </div>
 
 <script>
 // Restricts input for each element in the set of matched elements to the given inputFilter.
@@ -118,7 +106,9 @@ function changeBPM(){
 }
 </script>
 
+<div id="drawing">
 
+</div>
 
 </body>
 </html>
