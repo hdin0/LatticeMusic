@@ -11,9 +11,13 @@
 body {
   background-color: var(--main-color);
   padding: 5px;
-  overflow-y: hidden;
+  /* overflow-y: hidden; */
 }
 
+#controls {
+  text-align: center;
+  /* background: red;  */
+}
 
 #drawing {
   position: relative;
@@ -26,4 +30,12 @@ body {
 div.sideScroll{
   overflow-y: hidden;
   overflow-x: auto;
+}
+
+svg {
+  /* position: absolute; */
+  display: inline-block;
+  height: 100px;
+  width: 20px;
+  transform: scale(3);
 }
