@@ -1,14 +1,10 @@
-function hear( note_ind ){
-
-}
-
 var autoPlay = function(){
   // if (set_autoPlay){
   if ((finLoading) && (listening)){ //send msg to pd and svg
     let freq = readLattice(counter)
     midi = convertToMidi(freq);
+    addSVG(1,midi);
     osc.i(0).message([freq])
-    addNew(midi);
     counter++;
   }
     timeout = setTimeout(autoPlay, bpm);
@@ -24,20 +20,29 @@ function convertToMidi( f ){
   return Math.round((Math.log(f/440)/Math.log(2))*12+69);
 }
 
-function addNew( midi ){
-  if (cw==1){
-    draw.svg(staff_svg)
-    // draw.use('treble_staff','./assets/staff.svg').move(cw,100);
+// <button onclick="addSVG(1,)">Add</button>
+function addSVG(type,midi) {
+  node = document.getElementById("drawing");
+  let dis = (49-midi)*2 + (noteH*ch)+15;
+  switch (type){
+    case 1:
+      href='./assets/quarter2.svg#quarter';
 
-    console.log(draw);
-
+      // let xpos = 1;
+      // let ypos = 1;
+    break;
+      href='./assets/staff.svg#staff';
+    case 2:
+    break;
+    case 3:
+    break;
   }
-  // let note = new SVG().addTo('#drawing');
-  // note.size(15,42);
-  draw.use('svg5','./assets/quarter.svg').move((noteW*cw)+5,(49-midi)*2+(noteH*ch+5)); //49 is A concert pitch, 440, the higher the number, the lower on the screen (y).
+  node.innerHTML+='<' + 'svg role="presentation"' + '><' + 'use xlink:href="' + href + '" y="' + dis + '"/' + '><' + '/svg' + '>';
+  // console.log(1)
+  // node.parentNode.replaceChild(node.lastChild, node);
+
   if ((noteW*cw) > (window.innerWidth-300)){
     cw = 1;
     ch++;
   }
-  cw++;
 }
