@@ -1,41 +1,51 @@
 :root {
   /* Color Pallete */
-  --main-color: #FAF0E6;
-  --text-color: #9DA69B;
-  --text-color2: #2A3835;
-  --accent-color: #89968C;
-  --accent-color2: #273226;
-  --accent-color3: #8D958F;
+  --bg-color: #14171E;
+  --text-color: #A1A2A5;
+  --accent-color: #ffffff;
+  --accent-color2: #202021;
+  --header-color: #9098A0;
+  --header-border-color: #646A70;
 }
 
 body {
-  background-color: var(--main-color);
-  padding: 5px;
-  /* overflow-y: hidden; */
-}
-
-#controls {
-  text-align: center;
-  /* background: red;  */
-}
-
-#drawing {
-  position: relative;
-  top: 10vh;
-  padding: 20px;
-  /* background-color: green; */
-  /* max-width: 100vw; */
-}
-
-div.sideScroll{
+  background-color: var(--bg-color);
   overflow-y: hidden;
-  overflow-x: auto;
+}
+.header{
+  font-size: 24px;
+  padding: 10px;
+  background-color: var(--header-color);
+  width: 22%;
+  text-align: left;
+  border-width: thin;
+  border-color: var(--header-border-color);
+}
+
+.module{
+  float: left;
+  width: 40vw;
+  height: 90vh;
+  background-color: var(--accent-color2);
+  padding: 10px;
+  margin-top: 3vh;
+  margin-bottom: 5vh;
+  margin-left: 2vw;
+}
+
+.score {
+  float: right;
+  width: 50vw;
+  height: 90vh;
+  background-color: var(--accent-color);
+  padding: 10px;
+  margin-top: 3vh;
+  margin-bottom: 5vh;
+  margin-right: 2vw;
 }
 
 svg {
-  /* position: absolute; */
-  display: inline-block;
-  height: 100px;
-  width: 20px;
-  transform: scale(3);
+  /* background-color: blue; */
+  width: 100%;
+  height: 100%;
 }
