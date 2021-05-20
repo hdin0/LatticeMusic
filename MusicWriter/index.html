@@ -32,14 +32,12 @@
   let set_autoPlay = 0;
   let f0 = 220;
   let counter = 0;
+  let notepositionCounter = 0;
 
   //sight stuff
   // 20 is what i set width and height in styles.css
-  let noteH = 20;
-  let noteW = 20;
-  let cw = 1;
-  let ch = 1;
   let midi = 0;
+  let lineNo = 0;
 
   // staff line settings
 
@@ -51,7 +49,8 @@
   </div>
 
   <button id="startButton">Start</button>
-  <button id="align" onclick="resizeWindow()">Realign</button>
+  <input id="intTextBox"> <button id="bpm" onclick="changeBPM()">Set BPM</button>
+  <button id="align" onclick="resizeWindow()" disabled>Realign</button>
 </div>
 
 
@@ -99,6 +98,36 @@
 <script>
 function resizeWindow(){
   window.resizeTo(500,500);
+}
+</script>
+
+<script>
+// Restricts input for each element in the set of matched elements to the given inputFilter.
+(function($) {
+  $.fn.inputFilter = function(inputFilter) {
+    return this.on("input keydown keyup mousedown mouseup select contextmenu drop", function() {
+      if (inputFilter(this.value)) {
+        this.oldValue = this.value;
+        this.oldSelectionStart = this.selectionStart;
+        this.oldSelectionEnd = this.selectionEnd;
+      } else if (this.hasOwnProperty("oldValue")) {
+        this.value = this.oldValue;
+        this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+      } else {
+        this.value = "";
+      }
+    });
+  };
+}(jQuery));
+// https://stackoverflow.com/questions/995183/how-to-allow-only-numeric-0-9-in-html-inputbox-using-jquery/995193#995193
+
+// Install input filters.
+$("#intTextBox").inputFilter(function(value) {
+  return /^-?\d*$/.test(value); });
+
+function changeBPM(){
+  bpm = parseInt($("#intTextBox").val());
+  console.log(bpm);
 }
 </script>
 
