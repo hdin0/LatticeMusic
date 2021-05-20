@@ -3,7 +3,8 @@ var autoPlay = function(){
   if ((finLoading) && (listening)){ //send msg to pd and svg
     let freq = readLattice(counter)
     midi = convertToMidi(freq);
-    addSVG(1,midi);
+    console.log(midi);
+    addNote(counter,midi);
     osc.i(0).message([freq])
     counter++;
   }
@@ -20,29 +21,36 @@ function convertToMidi( f ){
   return Math.round((Math.log(f/440)/Math.log(2))*12+69);
 }
 
-// <button onclick="addSVG(1,)">Add</button>
-function addSVG(type,midi) {
-  node = document.getElementById("drawing");
-  let dis = (49-midi)*2 + (noteH*ch)+15;
-  switch (type){
-    case 1:
-      href='./assets/quarter2.svg#quarter';
+function addNote(counter,midi){
+  let xpos = 70; //this is middle C
+  let ypos = 78;
+  let yunit = 5;
+  let xunit = 20;
+  xpos = xpos + (counter*xunit);
+  ypos = ypos + (60-midi)*yunit;
 
-      // let xpos = 1;
-      // let ypos = 1;
-    break;
-      href='./assets/staff.svg#staff';
-    case 2:
-    break;
-    case 3:
-    break;
-  }
-  node.innerHTML+='<' + 'svg role="presentation"' + '><' + 'use xlink:href="' + href + '" y="' + dis + '"/' + '><' + '/svg' + '>';
-  // console.log(1)
-  // node.parentNode.replaceChild(node.lastChild, node);
+  var svg = document.getElementsByTagName('svg')[0];
+  var img = document.createElementNS("http://www.w3.org/2000/svg", "image");
+  img.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", "./assets/quarter.svg");
+  img.setAttributeNS(null, 'x', xpos);
+  img.setAttributeNS(null, 'y', ypos);
+  svg.appendChild(img);
 
-  if ((noteW*cw) > (window.innerWidth-300)){
-    cw = 1;
-    ch++;
+}
+
+// opt refers to clef
+function addStaffLine( opt ){
+  var svg = document.getElementsByTagName('svg')[0];
+  var img = document.createElementNS("http://www.w3.org/2000/svg", "image");
+  img.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", "./assets/staff.svg");
+  svg.appendChild(img);
+}
+
+function getRandomColor() {
+  var letters = '0123456789ABCDEF';
+  var color = '#';
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
   }
+  return color;
 }
