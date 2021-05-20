@@ -1,11 +1,11 @@
 <!doctype html>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
     <title>Live Music Notating</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-
-    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport"
+    <meta http-equiv="content-type"
+        content="application/xhtml+xml;charset=utf-8" />
+    <link rel="stylesheet" href="styles2.css">
     <script src="js/jquery.js"></script>
     <script src="js/webpd-latest.js"></script>
     <script src="js/svg4everybody.min.js"></script>
@@ -19,96 +19,90 @@
     </script>
 
 </head>
-<body>
-
-  <svg title="quarter" role="presentation" >
-    <use xlink:href="./assets/quarter2.svg#quarter" x="-10"/>
-    <!-- positino is -10, bc i want to hide it off the screen -->
-  </svg>
-  <!-- Necessary Fields -->
-  <script>
-    //sound
-    let latticePitchContents = new Array( 64000 );
-    let parts = [];
-    let finLoading = 0;
-    let listening = 0;
-    let bpm = 1000;
-    let set_autoPlay = 0;
-    let f0 = 220;
-    let counter = 0;
-
-    //sight stuff
-    // 20 is what i set width and height in styles.css
-    let noteH = 20;
-    let noteW = 20;
-    let cw = 1;
-    let ch = 1;
-    let midi = 0;
-  </script>
-
-  <div id="controls">
-  <input id="intTextBox">
-  <button id="bpm" onclick="changeBPM()">Set BPM</button>
-  <input>Starting Note</input>
-  <button id="startButton">Start</button>
-  </div>
-
-
-  <script>
-    var button = document.getElementById('startButton')
-    Pd.startOnClick(button, function() {
-      console.log('clicked!')
-      listening = 1;
-    })
-    let patch = Pd.createPatch();
-    let linArr = patch.createObject( 'line~', [440] );
-    let osc = patch.createObject( 'osc~', [440] );
-    let clip = patch.createObject( 'clip~', [-1, 1] );
-    let dac = patch.createObject( 'dac~' );
-
-    // linArr.o(0).connect( osc.i(0) );
-    osc.o(0).connect(clip.i(0));
-    clip.o(0).connect(dac.i(0));
-    clip.o(0).connect(dac.i(1));
-
-  </script>
-  <script src="loadFiles.js"></script>
-  <script src="notate.js"></script>
+<body onload="loadStaffLine()">
 
 
 <script>
-// Restricts input for each element in the set of matched elements to the given inputFilter.
-(function($) {
-  $.fn.inputFilter = function(inputFilter) {
-    return this.on("input keydown keyup mousedown mouseup select contextmenu drop", function() {
-      if (inputFilter(this.value)) {
-        this.oldValue = this.value;
-        this.oldSelectionStart = this.selectionStart;
-        this.oldSelectionEnd = this.selectionEnd;
-      } else if (this.hasOwnProperty("oldValue")) {
-        this.value = this.oldValue;
-        this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
-      } else {
-        this.value = "";
-      }
-    });
-  };
-}(jQuery));
-// https://stackoverflow.com/questions/995183/how-to-allow-only-numeric-0-9-in-html-inputbox-using-jquery/995193#995193
+  //sound
+  let latticePitchContents = new Array( 64000 );
+  let parts = [];
+  let finLoading = 0;
+  let listening = 0;
+  let bpm = 1000;
+  let set_autoPlay = 0;
+  let f0 = 220;
+  let counter = 0;
 
-// Install input filters.
-$("#intTextBox").inputFilter(function(value) {
-  return /^-?\d*$/.test(value); });
+  //sight stuff
+  // 20 is what i set width and height in styles.css
+  let noteH = 20;
+  let noteW = 20;
+  let cw = 1;
+  let ch = 1;
+  let midi = 0;
 
-function changeBPM(){
-  bpm = parseInt($("#intTextBox").val());
-  console.log(bpm);
+  // staff line settings
+
+</script>
+
+<div class="module">
+  <div class="header">
+    Modules:
+  </div>
+
+  <button id="startButton">Start</button>
+  <button id="align" onclick="resizeWindow()">Realign</button>
+</div>
+
+
+<script>
+  var button = document.getElementById('startButton')
+  Pd.startOnClick(button, function() {
+    console.log('clicked!')
+    listening = 1;
+  })
+  let patch = Pd.createPatch();
+  let linArr = patch.createObject( 'line~', [440] );
+  let osc = patch.createObject( 'osc~', [440] );
+  let clip = patch.createObject( 'clip~', [-1, 1] );
+  let dac = patch.createObject( 'dac~' );
+
+  // linArr.o(0).connect( osc.i(0) );
+  osc.o(0).connect(clip.i(0));
+  clip.o(0).connect(dac.i(0));
+  clip.o(0).connect(dac.i(1));
+
+</script>
+<script src="loadFiles.js"></script>
+<script src="notate.js"></script>
+
+<div class="score">
+  <svg xmlns="http://www.w3.org/2000/svg">
+
+  </svg>
+  <script>
+    function loadStaffLine(){
+      var svg = document.getElementsByTagName('svg')[0];
+      var img = document.createElementNS("http://www.w3.org/2000/svg", "image");
+      img.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", "./assets/staff.svg");
+      img.setAttributeNS(null, "x", -110);
+      img.setAttributeNS(null, "y", 0);
+      img.setAttributeNS(null, "width", 700);
+      img.setAttributeNS(null, "height", 350);
+      svg.appendChild(img);
+    }
+
+  </script>
+
+</div>
+
+<script>
+function resizeWindow(){
+  window.resizeTo(500,500);
 }
 </script>
 
-<div id="drawing">
 
-</div>
 
 </body>
 </html>
