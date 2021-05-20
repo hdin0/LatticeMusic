@@ -4,9 +4,10 @@ var autoPlay = function(){
     let freq = readLattice(counter)
     midi = convertToMidi(freq);
     console.log(midi);
-    addNote(counter,midi);
+    addNote(midi);
     osc.i(0).message([freq])
     counter++;
+    notepositionCounter++;
   }
     timeout = setTimeout(autoPlay, bpm);
 }
@@ -21,28 +22,48 @@ function convertToMidi( f ){
   return Math.round((Math.log(f/440)/Math.log(2))*12+69);
 }
 
-function addNote(counter,midi){
+// determines position of notes.
+function detPosition(){
   let xpos = 70; //this is middle C
   let ypos = 78;
   let yunit = 5;
   let xunit = 20;
-  xpos = xpos + (counter*xunit);
-  ypos = ypos + (60-midi)*yunit;
+  let linespace = 100;
+  xpos = xpos + (notepositionCounter*xunit);
+  if (xpos>560){
+    xpos=70;
+    notepositionCounter=0;
+    lineNo++;
+    addStaffLine( lineNo )
+  }
+  ypos = ypos + (60-midi)*yunit + (linespace*lineNo);
 
+  return [xpos,ypos];
+}
+
+function addNote(midi){
+  let p = detPosition();
   var svg = document.getElementsByTagName('svg')[0];
   var img = document.createElementNS("http://www.w3.org/2000/svg", "image");
   img.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", "./assets/quarter.svg");
-  img.setAttributeNS(null, 'x', xpos);
-  img.setAttributeNS(null, 'y', ypos);
+  img.setAttributeNS(null, 'x', p[0]);
+  // img.setAttributeNS(null, 'x', 560);
+  img.setAttributeNS(null, 'y', p[1]);
   svg.appendChild(img);
 
 }
 
 // opt refers to clef
-function addStaffLine( opt ){
+function addStaffLine( lineNo ){
+  let linespace = 100; //same as earlier, should organize fields.
+  let ypos = linespace*lineNo;
   var svg = document.getElementsByTagName('svg')[0];
   var img = document.createElementNS("http://www.w3.org/2000/svg", "image");
   img.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", "./assets/staff.svg");
+  img.setAttributeNS(null, "x", -110);
+  img.setAttributeNS(null, "y", ypos);
+  img.setAttributeNS(null, "width", 700);
+  img.setAttributeNS(null, "height", 350);
   svg.appendChild(img);
 }
 
