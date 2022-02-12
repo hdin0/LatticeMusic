@@ -1,7 +1,7 @@
 import * as THREE from "https://threejs.org/build/three.module.js";
 import Stats from 'https://threejs.org/examples/jsm/libs/stats.module.js';
-import { OrbitControls } from 'https://threejs.org/examples/jsm/controls/OrbitControls.js';
-import { GUI } from 'https://threejs.org/examples/jsm/libs/dat.gui.module.js';
+import { OrbitControls } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/controls/OrbitControls.js';
+import { GUI } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/libs/dat.gui.module.js';
 
 
 let altWidt = 0.75;
